@@ -10,7 +10,7 @@ if (option === "local") {
 }
 if (option === "backend") { 
     // Backend
-    API_BASE = 'http://educacenter.wuaze.com/api';
+    API_BASE = 'https://educacenter-backend.onrender.com/';
 }
 
 export default API_BASE;
