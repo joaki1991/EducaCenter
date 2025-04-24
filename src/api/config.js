@@ -10,7 +10,7 @@ if (option === "local") {
 }
 if (option === "backend") { 
     // Backend
-    API_BASE = 'https://educacenter-backend.onrender.com/';
+    API_BASE = 'https://educacenter-backend.onrender.com/api';
 }
 
 export default API_BASE;
