@@ -1,60 +1,36 @@
-import { useState } from 'react';
-import { Typography, Button, Box } from '@mui/material';
-import { logoutUser } from '../api/logout';
+import React from 'react';
+import Header from '../components/Header';
+import { Box } from '@mui/material';
+import SidePanelLayout from '../components/SidePanelLayout';
+import NewsCarousel from '../components/NewsCarousel';
+import logo from '../assets/logo.png';
+import fondo from '../assets/fondo.png';
 
-export default function Home({ onLogout }) {
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    setError('');
-    
-    try {
-      const response = await logoutUser();
-      
-      if (response.success) {
-        onLogout(); // Llama a la función del componente App para redirigir al login
-      } else {
-        setError(response.message || 'Error al cerrar sesión');
-        setIsLoggingOut(false);
-      }
-    } catch (err) {
-      setError('Error al conectar con el servidor');
-      setIsLoggingOut(false);
-    }
-  };
+function Home({ onLogout }) {
+  const header = (
+    <Header
+      userName="Admin"
+      userImage="https://i.pravatar.cc/150?img=2"
+      onLogout={onLogout}
+      onMessages={() => console.log('Messages')}
+      logoImage={logo}
+    />
+  );
 
   return (
     <Box
-      sx={{
-        p: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-      }}
-    >
-      <Typography variant="h4" gutterBottom>
-        Bienvenido a EducaCenter
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        Has iniciado sesión correctamente.
-      </Typography>
-      {error && (
-        <Typography variant="body2" color="error" gutterBottom>
-          {error}
-        </Typography>
-      )}
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={handleLogout}
-        disabled={isLoggingOut}
-      >
-        {isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
-      </Button>
+    sx={{     
+      minHeight: '100vh',
+      width: '100%',
+      backgroundImage: `url(${fondo})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',      
+    }}
+  >    <SidePanelLayout header={header}>   
+        <NewsCarousel />     
+      </SidePanelLayout>
     </Box>
   );
 }
+
+export default Home;

@@ -31,6 +31,7 @@ export default function Login({ onLogin }) {
         setError(response.message || 'Credenciales inválidas');
       }
     } catch (err) {
+      console.error('Error al iniciar sesión:', err);
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);

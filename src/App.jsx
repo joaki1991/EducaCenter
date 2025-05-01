@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './components/theme';
 import Login from './views/Login';
 import Home from './views/Home';
 import ProtectedRoute from './components/ProtectedRoute';
+import { logoutUser } from './api/logout';
 
 // Este componente se encargará de gestionar las rutas de la aplicación.
 // Si la ruta es /, se cargará el componente Login, que es la página de login de la aplicación teniendo en cuenta que el usuario no ha iniciado sesión.
@@ -13,7 +17,7 @@ function App() {
   
   // Verificar si hay un token al cargar la aplicación
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
     }
@@ -25,40 +29,50 @@ function App() {
   };
 
   // Función para manejar el cierre de sesión
-  const handleLogout = () => {   
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    try {
+      await logoutUser(); // Llama al backend para cerrar sesión
+    } catch (error) {
+      console.error('Error cerrando sesión en backend:', error);
+    } finally {
+      localStorage.removeItem('token');
+      setIsAuthenticated(false);
+    }
   };
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Ruta de Login - redirige a Home si ya está autenticado */}
-        <Route 
-          path="/login" 
-          element={
-            isAuthenticated ? 
-              <Navigate to="/" /> : 
-              <Login onLogin={handleLogin} />
-          } 
-        />
+    <ThemeProvider theme={theme}>
+    <CssBaseline /> {/* Normaliza estilos por defecto */}
+      <BrowserRouter>
+        <Routes>
+          {/* Ruta de Login - redirige a Home si ya está autenticado */}
+          <Route 
+            path="/login" 
+            element={
+              isAuthenticated ? 
+                <Navigate to="/" /> : 
+                <Login onLogin={handleLogin} />
+            } 
+          />
 
-        {/* Rutas protegidas */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <Home onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        
-        {/* Redirigir cualquier otra ruta a la página principal o login según autenticación */}
-        <Route 
-          path="*" 
-          element={<Navigate to={isAuthenticated ? "/" : "/login"} />} 
-        />
-      </Routes>
-    </BrowserRouter>
+          {/* Rutas protegidas */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <Home onLogout={handleLogout} />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Redirigir cualquier otra ruta a la página principal o login según autenticación */}
+          <Route 
+            path="*" 
+            element={<Navigate to={isAuthenticated ? "/" : "/login"} />} 
+          />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

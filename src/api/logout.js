@@ -7,7 +7,7 @@ export const logoutUser = async () => {
       const data = response.data;
   
       if (data.success) {
-        logout(); // Si hay respuesta  de éxito por parte del servidor, borramos el token y el rol en sessionStorage
+        logout(); // Si hay respuesta  de éxito por parte del servidor, borramos el token y el rol en localStorage
         return { success: true };
       } else {
         return { success: false, message: data.message || "Error al cerrar sesión" };
