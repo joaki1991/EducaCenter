@@ -13,7 +13,7 @@ const api = axios.create({
 // Interceptor para añadir el token automáticamente si existe
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("EducaCenterToken");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }

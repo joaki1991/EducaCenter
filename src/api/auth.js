@@ -2,23 +2,25 @@
 // Se utiliza localStorage para almacenar el token y el rol del usuario una vez que se ha autenticado. 
 
 // Guarda el token en localStorage
-export const login = (token, role) => {
-  localStorage.setItem("token", token);
-  localStorage.setItem("role", role);
+export const login = (token, role, name, surname) => {
+  localStorage.setItem("EducaCenterToken", token);
+  localStorage.setItem("EducaCenterRole", role);
+  localStorage.setItem("EducaCenterUser", [name || "Usuario", surname || ""].join(" ").trim());
 };
 
 // Elimina el token del localStorage
 export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
+  localStorage.removeItem("EducaCenterToken");
+  localStorage.removeItem("EducaCenterRole");
+  localStorage.removeItem("EducaCenterUser");
 };
 
 // Comprueba si el usuario está autenticado
 export const isAuthenticated = () => {
-  return localStorage.getItem("token") !== null;
+  return localStorage.getItem("EducaCenterToken") !== null;
 };
 
 // Obtiene el token actual (por si hay que usarlo en el headers)
 export const getToken = () => {
-  return localStorage.getItem("token");
+  return localStorage.getItem("EducaCenterToken");
 };

@@ -5,12 +5,14 @@ import SidePanelLayout from '../components/SidePanelLayout';
 import NewsCarousel from '../components/NewsCarousel';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
+import API_BASE from '../api/config';
 
 function Home({ onLogout }) {
+  const user = localStorage.getItem('EducaCenterUser');
   const header = (
     <Header
-      userName="Admin"
-      userImage="https://i.pravatar.cc/150?img=2"
+      userName= {user ? user : 'Usuario'}
+      userImage= {API_BASE+'/profile_photo/'+user+'.jpg'}
       onLogout={onLogout}
       onMessages={() => console.log('Messages')}
       logoImage={logo}

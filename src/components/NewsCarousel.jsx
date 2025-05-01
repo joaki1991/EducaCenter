@@ -3,6 +3,7 @@ import { Box, Typography, IconButton, CircularProgress } from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import api from '../api/axios'; 
 import API_BASE from '../api/config'; 
+import notFound from '../assets/not-found.png'; // Ruta de la imagen prediseñada
 
 const NewsCarousel = () => {
   const [news, setNews] = useState([]);
@@ -72,6 +73,10 @@ const NewsCarousel = () => {
           src={API_BASE+'/announcements_photo/'+currentNews.id+'.jpg'}
           alt={currentNews.title}
           style={{ width: '100%', borderRadius: '8px' }}
+          onError={(e) => {
+            e.target.onerror = null; // Previene un bucle si la imagen predeterminada también falla
+            e.target.src = notFound; // Ruta de imagen prediseñada
+          }}
         />
         <Typography variant="h6" mt={2}>
           {currentNews.title}

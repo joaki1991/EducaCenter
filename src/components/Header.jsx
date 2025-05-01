@@ -9,6 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MailIcon from '@mui/icons-material/Mail';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import defaultUserImage from '../assets/default-user.png'; 
 
 const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
   const theme = useTheme();
@@ -19,8 +20,8 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
       position="static"
       elevation={3}
       sx={{
-        backgroundColor: '#e3f2fd',
-        color: '#0d47a1',
+        backgroundColor: '#1E3A8A', // azul marino
+        color: '#FFFFFF',           // texto blanco
         paddingY: 2,
       }}
     >
@@ -68,14 +69,20 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.5 }}>
-            <Avatar src={userImage} alt={userName}>
+            <Avatar src={userImage} alt={userName} sx={{ width: 60, height: 60}}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = defaultUserImage; 
+              }}
+            >
               {userName?.[0]}
             </Avatar>
-            <IconButton onClick={onMessages} sx={{ color: '#0d47a1', '&:hover': { backgroundColor: '#bbdefb' }, borderRadius: 8 }}>
+            <IconButton onClick={onMessages} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#334155' }, borderRadius: 8 }}>
               <Typography
                 variant="body3"
                 sx={{
-                  fontWeight: 700,                         
+                  fontWeight: 700,
+                  color: '#FFFFFF', // aseguramos que el texto también sea blanco
                   px: 1,
                   py: 1,
                 }}
@@ -86,10 +93,10 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <IconButton onClick={onMessages} sx={{ color: '#0d47a1', '&:hover': { backgroundColor: '#bbdefb' } }}>
+            <IconButton onClick={onMessages} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#334155' } }}>
               <MailIcon />
             </IconButton>
-            <IconButton onClick={onLogout} sx={{ color: '#0d47a1', '&:hover': { backgroundColor: '#bbdefb' } }}>
+            <IconButton onClick={onLogout} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#334155' } }}>
               <LogoutIcon />
             </IconButton>
           </Box>

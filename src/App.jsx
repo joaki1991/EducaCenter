@@ -17,7 +17,7 @@ function App() {
   
   // Verificar si hay un token al cargar la aplicación
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('EducaCenterToken');
     if (token) {
       setIsAuthenticated(true);
     }
@@ -35,7 +35,7 @@ function App() {
     } catch (error) {
       console.error('Error cerrando sesión en backend:', error);
     } finally {
-      localStorage.removeItem('token');
+      localStorage.removeItem('EducaCenterToken');
       setIsAuthenticated(false);
     }
   };

@@ -59,7 +59,7 @@ const SidePanelLayout = ({ children, header }) => {
       <Box
         sx={{
           width: '100%',
-          marginLeft: open ? '260px' : 0,  // El contenedor también se mueve según el ancho del panel
+          marginLeft: open ? '250px' : 0,  // El contenedor también se mueve según el ancho del panel
           transition: 'margin-left 0.3s ease',
         }}
       >

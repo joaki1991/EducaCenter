@@ -11,7 +11,7 @@ export const loginUser = async (email, password) => {
     const data = response.data;
 
     if (data.token) {
-      login(data.token, data.role); // Si hay respuesta por parte del servidor, guarda el token y el rol en localStorage
+      login(data.token, data.role, data.name, data.surname); // Si hay respuesta por parte del servidor, guarda el token y el rol en localStorage
       return { success: true };
     } else {
       return { success: false, message: data.message || "Credenciales incorrectas" };
