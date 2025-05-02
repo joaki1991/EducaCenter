@@ -14,7 +14,20 @@ import { logoutUser } from './api/logout';
 function App() {
   // Estado para gestionar la autenticación
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // En la siguiente constante se define el tiempo de expiración del token en horas.
+  const hours = 2;
+  // Verificar si el token ha expirado al cargar la aplicación 
+  // Si ha transcurrido más de 2 horas desde el inicio de sesión, se eliminará el token y se recargará la página.
+  useEffect(() => {
+    const loginTime = localStorage.getItem("EducaCenterLoginTime");
+    const expirationTime = 60*hours * 60 * 1000;
   
+    if (loginTime && Date.now() - parseInt(loginTime, 10) > expirationTime) {
+      localStorage.clear();
+      window.location.reload(); // Opcional: forzar recarga
+    }
+  }, []);
+
   // Verificar si hay un token al cargar la aplicación
   useEffect(() => {
     const token = localStorage.getItem('EducaCenterToken');

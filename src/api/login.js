@@ -11,15 +11,15 @@ export const loginUser = async (email, password) => {
     const data = response.data;
 
     if (data.token) {
-      login(data.token, data.role, data.name, data.surname); // Si hay respuesta por parte del servidor, guarda el token y el rol en localStorage
+      login(data.token, data.role, data.name, data.surname, data.id); // Si hay respuesta por parte del servidor, guarda el token y el rol en localStorage
       return { success: true };
     } else {
-      return { success: false, message: data.message || "Credenciales incorrectas" };
+      return { success: false, message: data.error || "Credenciales incorrectas" };
     }
   } catch (error) {
     return {
       success: false,
-      message: error.response?.data?.message || "Error al conectar con el servidor",
+      message: error.response?.data?.error || "Error al conectar con el servidor",
     };
   }
 };

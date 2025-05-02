@@ -11,7 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import defaultUserImage from '../assets/default-user.png'; 
 
-const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
+const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSettings }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -69,7 +69,7 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.5 }}>
-            <Avatar src={userImage} alt={userName} sx={{ width: 60, height: 60}}
+            <Avatar src={userImage} alt={userName} sx={{ width: 60, height: 60, backgroundColor: 'grey' }}
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = defaultUserImage; 
@@ -77,7 +77,7 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
             >
               {userName?.[0]}
             </Avatar>
-            <IconButton onClick={onMessages} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#334155' }, borderRadius: 8 }}>
+            <IconButton onClick={onOpenSettings} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' }, borderRadius: 8 }}>
               <Typography
                 variant="body3"
                 sx={{
@@ -93,10 +93,10 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage }) => {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <IconButton onClick={onMessages} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#334155' } }}>
+            <IconButton onClick={onMessages} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' } }}>
               <MailIcon />
             </IconButton>
-            <IconButton onClick={onLogout} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#334155' } }}>
+            <IconButton onClick={onLogout} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' } }}>
               <LogoutIcon />
             </IconButton>
           </Box>
