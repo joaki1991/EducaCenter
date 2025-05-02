@@ -11,7 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import defaultUserImage from '../assets/default-user.png'; 
 
-const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSettings }) => {
+const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSettings, onOpenPhotoUpdate }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -69,14 +69,16 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.5 }}>
-            <Avatar src={userImage} alt={userName} sx={{ width: 60, height: 60, backgroundColor: 'grey' }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = defaultUserImage; 
-              }}
-            >
-              {userName?.[0]}
-            </Avatar>
+            <IconButton>
+              <Avatar onClick={onOpenPhotoUpdate} src={userImage} alt={userName} sx={{ width: 60, height: 60, backgroundColor: 'grey' }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = defaultUserImage; 
+                }}
+              >
+                {userName?.[0]}
+              </Avatar>
+            </IconButton>
             <IconButton onClick={onOpenSettings} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' }, borderRadius: 8 }}>
               <Typography
                 variant="body3"
