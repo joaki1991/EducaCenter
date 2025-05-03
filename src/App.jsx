@@ -3,10 +3,17 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './components/theme';
-import Login from './views/Login';
-import Home from './views/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import { logoutUser } from './api/logout';
+import Login from './views/Login';
+import Home from './views/Home';
+import User from './views/User';
+import Messages from './views/Messages';
+import Absences from './views/Absences';
+import Reports from './views/Reports';
+import News from './views/News';
+import UsersAdmin from './views/UsersAdmin';
+import GroupsAdmin from './views/GroupsAdmin';
 
 // Este componente se encargará de gestionar las rutas de la aplicación.
 // Si la ruta es /, se cargará el componente Login, que es la página de login de la aplicación teniendo en cuenta que el usuario no ha iniciado sesión.
@@ -78,6 +85,69 @@ function App() {
             }
           />
           
+          <Route
+            path="/usuario"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>                
+                <User />                
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/mensajes"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>                
+                <Messages />                
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/faltas"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>               
+                <Absences />                
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/informes"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>                
+                <Reports />                
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/noticias"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>                
+                <News />                
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/usuarios"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>                
+                <UsersAdmin />                
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/grupos"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>                
+                <GroupsAdmin />                
+              </ProtectedRoute>
+            }
+          />
+
           {/* Redirigir cualquier otra ruta a la página principal o login según autenticación */}
           <Route 
             path="*" 

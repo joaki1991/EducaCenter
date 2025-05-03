@@ -10,10 +10,12 @@ import MailIcon from '@mui/icons-material/Mail';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import defaultUserImage from '../assets/default-user.png'; 
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSettings, onOpenPhotoUpdate }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
 
   return (
     <AppBar
@@ -34,7 +36,9 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
       >
         {/* Logo */}
         <Box
+          onClick={() => navigate('/')}
           sx={{
+            cursor: 'pointer',
             position: isMobile ? 'static' : 'absolute',
             left: 0,
             right: 0,
@@ -42,8 +46,7 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
             display: 'flex',
             justifyContent: 'center',
             mb: isMobile ? 2 : 0,
-            pointerEvents: 'none',
-            zIndex: 0,
+            zIndex: 2, // más alto que 0 para asegurar que se pueda clicar
           }}
         >
           <img
@@ -56,7 +59,6 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
             }}
           />
         </Box>
-
         {/* Usuario + Iconos */}
         <Box
           sx={{

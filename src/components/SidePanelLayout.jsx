@@ -1,72 +1,116 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Button,
+  Collapse,  
+  Stack,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate } from 'react-router-dom';
 
 const SidePanelLayout = ({ children, header }) => {
   const [open, setOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));  // Detectamos si es un móvil
-
-  // Definir el ancho del panel dependiendo si es móvil o no
-  const drawerWidth = isMobile ? '100%' : '250px';  // En móviles, panel lateral ocupa el 100% de la pantalla
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const drawerWidth = isMobile ? '100%' : '260px';
+  const navigate = useNavigate();
+  const role = localStorage.getItem('EducaCenterRole'); 
 
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* Panel lateral fijo */}
       {open && (
         <Box
           sx={{
             position: 'fixed',
             top: 0,
             left: 0,
-            width: drawerWidth,  // Usamos el ancho calculado
+            width: drawerWidth,
             height: '100vh',
-            backgroundColor: '#e3f2fd',
-            p: 2,
+            backgroundColor: '#e8f0fe', // azul claro
+            p: 3,
             boxShadow: 3,
             zIndex: 1300,
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: 'space-between',
           }}
         >
-          {/* Botón de cerrar panel */}
-          <IconButton
-            onClick={() => setOpen(false)}
-            sx={{
-              ...(isMobile
-                ? {}
-                : {
-                    alignSelf: 'flex-end',
-                    position: 'absolute',
-                  }),
-              top: 10,
-              right: 10,
-              zIndex: 1400,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+          {/* Encabezado y botón de cerrar */}
+          <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h6" fontWeight="bold" color="#1a237e">
+                MENÚ
+              </Typography>
+              <IconButton onClick={() => setOpen(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>           
 
-          {/* Contenido del panel lateral */}
-          <Typography variant="h6">Menú</Typography>
-          <Typography>Opción 1</Typography>
-          <Typography>Opción 2</Typography>
+            {/* Botones principales */}
+            <Stack spacing={1.5} sx={{ mt: 4 }}>
+              <Button fullWidth variant="contained" sx={btnStyle} onClick={() => navigate('/usuario')}>Usuario</Button>
+              <Button fullWidth variant="contained" sx={btnStyle} onClick={() => navigate('/mensajes')}>Mensajes</Button>
+              <Button fullWidth variant="contained" sx={btnStyle} onClick={() => navigate('/faltas')}>Faltas de asistencia</Button>
+              <Button fullWidth variant="contained" sx={btnStyle} onClick={() => navigate('/informes')}>Informe de alumnado</Button>
+
+              {(role === 'admin' || role === 'teacher') && (
+                <Button fullWidth variant="contained" sx={btnStyle} onClick={() => navigate('/noticias')}>Noticias</Button>
+              )}
+              {(role === 'student' || role === 'parent') && (
+                <Button fullWidth variant="contained" sx={btnStyle} onClick={() => navigate('/')}>Noticias</Button>
+              )}
+
+              {role === 'admin' && (
+                <>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    sx={btnStyle}
+                    onClick={() => setAdminOpen(!adminOpen)}
+                  >
+                    Administración
+                  </Button>
+                  <Collapse in={adminOpen}>
+                    <Box
+                      sx={{
+                        mt: 1,
+                        pl: 2,
+                        pt: 1,
+                        pb: 1,
+                        backgroundColor: '#d0e3fc',
+                        borderRadius: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1,
+                      }}
+                    >
+                      <Button variant="text" sx={subBtnStyle} onClick={() => navigate('/admin/usuarios')}>Usuarios</Button>
+                      <Button variant="text" sx={subBtnStyle} onClick={() => navigate('/admin/grupos')}>Grupos</Button>
+                    </Box>
+                  </Collapse>
+                </>
+              )}
+            </Stack>
+          </Box>          
         </Box>
       )}
 
-      {/* Wrapper desplazable */}
+      {/* Contenido principal */}
       <Box
         sx={{
           width: '100%',
-          marginLeft: open ? '250px' : 0,  // El contenedor también se mueve según el ancho del panel
+          marginLeft: open && !isMobile ? drawerWidth : 0,
           transition: 'margin-left 0.3s ease',
         }}
       >
-        {/* Header */}
         {header}
 
-        {/* Botón menú debajo del header */}
         {!open && (
           <Box sx={{ mt: 2, ml: 2 }}>
             <IconButton
@@ -82,13 +126,33 @@ const SidePanelLayout = ({ children, header }) => {
           </Box>
         )}
 
-        {/* Contenido principal */}
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
+        <Box sx={{ p: 3 }}>{children}</Box>
       </Box>
     </Box>
   );
+};
+
+// Estilos reutilizables
+const btnStyle = {
+  backgroundColor: '#1976d2',
+  color: 'white',
+  textTransform: 'none',
+  fontWeight: 'bold',
+  borderRadius: 2,
+  '&:hover': {
+    backgroundColor: '#1565c0',
+  },
+};
+
+const subBtnStyle = {
+  justifyContent: 'flex-start',
+  textTransform: 'none',
+  fontWeight: 'bold',
+  color: '#1a237e',
+  pl: 1,
+  '&:hover': {
+    backgroundColor: '#bbdefb',
+  },
 };
 
 export default SidePanelLayout;
