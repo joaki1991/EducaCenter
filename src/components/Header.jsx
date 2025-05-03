@@ -36,9 +36,7 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
       >
         {/* Logo */}
         <Box
-          onClick={() => navigate('/')}
           sx={{
-            cursor: 'pointer',
             position: isMobile ? 'static' : 'absolute',
             left: 0,
             right: 0,
@@ -46,18 +44,27 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
             display: 'flex',
             justifyContent: 'center',
             mb: isMobile ? 2 : 0,
-            zIndex: 2, // más alto que 0 para asegurar que se pueda clicar
+            zIndex: 2,
+            pointerEvents: 'none', // <<< evita que el box bloquee clics
           }}
         >
-          <img
-            src={logoImage}
-            alt="EducaCenter Logo"
-            style={{
-              maxWidth: '150px',
-              width: '100%',
-              height: 'auto',
+          <Box
+            onClick={() => navigate('/')}
+            sx={{
+              cursor: 'pointer',
+              pointerEvents: 'auto', // <<< permite clic solo en la imagen
             }}
-          />
+          >
+            <img
+              src={logoImage}
+              alt="EducaCenter Logo"
+              style={{
+                maxWidth: '150px',
+                width: '100%',
+                height: 'auto',
+              }}
+            />
+          </Box>
         </Box>
         {/* Usuario + Iconos */}
         <Box

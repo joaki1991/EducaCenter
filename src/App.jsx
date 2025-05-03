@@ -89,7 +89,7 @@ function App() {
             path="/usuario"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>                
-                <User />                
+                <User onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
@@ -98,7 +98,7 @@ function App() {
             path="/mensajes"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>                
-                <Messages />                
+                <Messages onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
@@ -107,7 +107,7 @@ function App() {
             path="/faltas"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>               
-                <Absences />                
+                <Absences onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
@@ -116,7 +116,7 @@ function App() {
             path="/informes"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>                
-                <Reports />                
+                <Reports onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
@@ -125,7 +125,7 @@ function App() {
             path="/noticias"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>                
-                <News />                
+                <News onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
@@ -134,7 +134,7 @@ function App() {
             path="/admin/usuarios"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>                
-                <UsersAdmin />                
+                <UsersAdmin onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
@@ -143,7 +143,7 @@ function App() {
             path="/admin/grupos"
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>                
-                <GroupsAdmin />                
+                <GroupsAdmin onLogout={handleLogout} />                
               </ProtectedRoute>
             }
           />
