@@ -11,9 +11,9 @@ import {
   TableRow,
   Paper
 } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Link as LinkIcon } from '@mui/icons-material';
 
-const UsersPanel = ({ users, onAdd, onEdit, onDelete }) => {
+const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
   return (
     <Box p={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -60,8 +60,18 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete }) => {
                     size="small"
                     onClick={() => onDelete(user.id)}
                     startIcon={<Delete />}
+                    sx={{ mr: 1 }}
                   >
                     Eliminar
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    size="small"
+                    onClick={() => onLink(user)}
+                    startIcon={<LinkIcon />}
+                  >
+                    Vincular
                   </Button>
                 </TableCell>
               </TableRow>
