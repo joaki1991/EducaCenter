@@ -90,10 +90,16 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
             </IconButton>
             <IconButton onClick={onOpenSettings} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' }, borderRadius: 8 }}>
               <Typography
-                variant="body3"
+                variant="body2"
+                noWrap
+                title={userName}
                 sx={{
                   fontWeight: 700,
-                  color: '#FFFFFF', // aseguramos que el texto también sea blanco
+                  color: '#FFFFFF',
+                  maxWidth: isMobile ? 100 : 200, // Ajusta el ancho según el tamaño de pantalla
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                   px: 1,
                   py: 1,
                 }}
