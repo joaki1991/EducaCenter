@@ -8,13 +8,12 @@ import Box from '@mui/material/Box';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MailIcon from '@mui/icons-material/Mail';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 import defaultUserImage from '../assets/default-user.png'; 
 import { useNavigate } from 'react-router-dom';
 
 const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSettings, onOpenPhotoUpdate }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  const isMobile = useMediaQuery('(max-width:1050px)');
   const navigate = useNavigate();
 
   return (
@@ -90,13 +89,13 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
             </IconButton>
             <IconButton onClick={onOpenSettings} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' }, borderRadius: 8 }}>
               <Typography
-                variant="body2"
+                variant="body3"
                 noWrap
                 title={userName}
                 sx={{
                   fontWeight: 700,
                   color: '#FFFFFF',
-                  maxWidth: isMobile ? 100 : 200, // Ajusta el ancho según el tamaño de pantalla
+                  maxWidth: isMobile ? 150 : 400, 
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',

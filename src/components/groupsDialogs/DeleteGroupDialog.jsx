@@ -9,7 +9,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import api from '../api/axios';
+import api from '../../api/axios';
 
 const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
   const [snackbar, setSnackbar] = React.useState({
@@ -19,7 +19,9 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
   });
 
   const handleDelete = () => {
-    api.delete(`/groups.php?id=${group.id}`) // Hacemos la petición DELETE con el ID del grupo
+      api.delete('/groups.php', {
+        data: { id: group.id } // El id va en el body como JSON
+      })
       .then(() => {
         setSnackbar({
           open: true,
@@ -48,15 +50,21 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>Confirmación de eliminación</DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
-            ¿Estás seguro de que deseas eliminar el grupo "{group.name}"?
-          </Typography>
+         {group ? (
+            <Typography variant="body1">
+              ¿Estás seguro de que deseas eliminar a {group.name} 
+            </Typography>
+          ) : (
+            <Typography variant="body1">
+              Cargando datos del grupo...
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="secondary">
             Cancelar
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
+          <Button onClick={handleDelete} color="error" variant="contained" disabled={!group}>
             Borrar
           </Button>
         </DialogActions>

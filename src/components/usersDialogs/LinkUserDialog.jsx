@@ -88,7 +88,7 @@ const LinkUserDialog = ({ open, onClose, user, onUserLinked }) => {
             severity: 'error'
           });
         });
-    } else if (user.role === 'student' && selectedGroup && selectedParent) {
+    } else if (user.role === 'student' && (selectedGroup || selectedParent)) {
       // Vincular al grupo y al padre para el student
       api.put('/groups.php', { userId: user.id, groupId: selectedGroup, parentId: selectedParent })
         .then(() => {
@@ -111,7 +111,7 @@ const LinkUserDialog = ({ open, onClose, user, onUserLinked }) => {
     } else {
       setSnackbar({
         open: true,
-        message: 'Debe seleccionar un grupo y un padre (si es estudiante)',
+        message: 'Debe seleccionar un grupo o un padre (si es estudiante)',
         severity: 'warning'
       });
     }

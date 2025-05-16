@@ -36,7 +36,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
         surname: user.surname || '',
         email: user.email || '',
         role: user.role || '',
-        password: '' // No se muestra la contraseña en el modal
+        password: user.password || '' 
       });
     }
   }, [user]);

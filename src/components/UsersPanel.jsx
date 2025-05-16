@@ -18,7 +18,12 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
     <Box p={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Gestión de Usuarios</Typography>
-        <Button variant="contained" color="primary" onClick={onAdd}>
+        <Button
+          type="button"
+          variant="contained"
+          color="primary"
+          onClick={onAdd}
+        >
           Añadir Usuario
         </Button>
       </Box>
@@ -40,11 +45,12 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.surname || '-'}</TableCell>
-                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.email || '-'}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.group_name || '-'}</TableCell>
                 <TableCell align="center">
                   <Button
+                    type="button"
                     variant="outlined"
                     color="primary"
                     size="small"
@@ -55,6 +61,7 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
                     Editar
                   </Button>
                   <Button
+                    type="button"
                     variant="outlined"
                     color="error"
                     size="small"
@@ -64,15 +71,19 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
                   >
                     Eliminar
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    size="small"
-                    onClick={() => onLink(user)}
-                    startIcon={<LinkIcon />}
-                  >
-                    Vincular
-                  </Button>
+                  {/* Solo mostrar el botón "Vincular" si el rol no es "admin" o "parent" */}
+                  {user.role !== 'admin' && user.role !== 'parent' && (
+                    <Button
+                      type="button"
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      onClick={() => onLink(user)}
+                      startIcon={<LinkIcon />}
+                    >
+                      Vincular
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

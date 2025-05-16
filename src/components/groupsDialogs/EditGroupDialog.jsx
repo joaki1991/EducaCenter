@@ -10,9 +10,9 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import api from '../api/axios';
+import api from '../../api/axios';
 
-const EditGroupDialog = ({ open, onClose, groupId, onGroupUpdated }) => {
+const EditGroupDialog = ({ open, onClose, group, onGroupUpdated }) => {
   const [formData, setFormData] = useState({
     name: ''
   });
@@ -21,25 +21,13 @@ const EditGroupDialog = ({ open, onClose, groupId, onGroupUpdated }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
-    if (groupId) {
-      // Obtener los datos del grupo al abrir el modal
-      api.get(`/groups.php?id=${groupId}`)
-        .then(res => {
-          const group = res.data;
-          setFormData({
-            name: group.name || ''
-          });
-        })
-        .catch(err => {
-          console.error('Error al cargar los datos del grupo:', err);
-          setSnackbar({
-            open: true,
-            message: 'Error al cargar los datos del grupo',
-            severity: 'error'
-          });
-        });
+    if (group) {
+      // Si se pasa un grupo, actualizar el formulario con los datos del grupo
+      setFormData({
+        name: group.name || '',        
+      });
     }
-  }, [groupId]);
+  }, [group]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,11 +45,11 @@ const EditGroupDialog = ({ open, onClose, groupId, onGroupUpdated }) => {
     if (!validate()) return;
 
     const payload = {
-      id: groupId,
+      id: group.id,
       name: formData.name.trim()
     };
 
-    api.put('/groups.php', payload) // Cambié de POST a PUT aquí
+    api.put('/groups.php', payload) 
       .then(() => {
         setSnackbar({
           open: true,
@@ -70,7 +58,7 @@ const EditGroupDialog = ({ open, onClose, groupId, onGroupUpdated }) => {
         });
 
         if (typeof onGroupUpdated === 'function') {
-          onGroupUpdated(); // Notifica al padre para que recargue
+          onGroupUpdated(); 
         }
 
         handleCancel(); // Limpia el formulario

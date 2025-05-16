@@ -10,7 +10,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import api from '../api/axios';
+import api from '../../api/axios';
 
 const AddGroupDialog = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
