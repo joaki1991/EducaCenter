@@ -4,7 +4,7 @@ const option = "local";
 
 let API_BASE; // Declare API_BASE outside the blocks
 
-if (option === "local") {
+if (option === "backend") {
     // Localhost
     API_BASE = 'http://localhost/EducaCenter/api';
 }
