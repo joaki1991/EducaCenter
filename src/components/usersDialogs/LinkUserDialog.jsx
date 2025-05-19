@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
-const LinkUserDialog = ({ open, onClose, user, onUserLinked }) => {
+const LinkUserDialog = ({ open, onClose, user }) => {
   const [groups, setGroups] = useState([]);
   const [parents, setParents] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState('');
@@ -67,56 +67,62 @@ const LinkUserDialog = ({ open, onClose, user, onUserLinked }) => {
     }
   }, [open, user]);
 
-  const handleSave = () => {
-    if (user.role === 'teacher' && selectedGroup) {
-      // Vincular al grupo para el teacher
-      api.put('/groups.php', { userId: user.id, groupId: selectedGroup })
-        .then(() => {
-          setSnackbar({
-            open: true,
-            message: 'Profesor vinculado al grupo correctamente',
-            severity: 'success'
-          });
-          onUserLinked(); // Notifica al padre para recargar usuarios o actualizar la lista de grupos
-          onClose();
-        })
-        .catch(err => {
-          console.error('Error al vincular el profesor:', err);
-          setSnackbar({
-            open: true,
-            message: 'Error al vincular al grupo',
-            severity: 'error'
-          });
+const handleSave = () => {
+  if (user.role === 'teacher' && selectedGroup) {
+    // Crear o actualizar en tabla `teachers`
+    api.put('/teachers.php', {
+      user_id: user.id,
+      group_id: selectedGroup
+    })
+      .then(() => {
+        setSnackbar({
+          open: true,
+          message: 'Profesor vinculado al grupo correctamente',
+          severity: 'success'
+        });        
+        onClose();
+      })
+      .catch(err => {
+        console.error('Error al vincular el profesor:', err);
+        setSnackbar({
+          open: true,
+          message: 'Error al vincular al grupo',
+          severity: 'error'
         });
-    } else if (user.role === 'student' && (selectedGroup || selectedParent)) {
-      // Vincular al grupo y al padre para el student
-      api.put('/groups.php', { userId: user.id, groupId: selectedGroup, parentId: selectedParent })
-        .then(() => {
-          setSnackbar({
-            open: true,
-            message: 'Estudiante vinculado correctamente',
-            severity: 'success'
-          });
-          onUserLinked();
-          onClose();
-        })
-        .catch(err => {
-          console.error('Error al vincular al estudiante:', err);
-          setSnackbar({
-            open: true,
-            message: 'Error al vincular al grupo y al padre',
-            severity: 'error'
-          });
-        });
-    } else {
-      setSnackbar({
-        open: true,
-        message: 'Debe seleccionar un grupo o un padre (si es estudiante)',
-        severity: 'warning'
       });
-    }
-  };
 
+  } else if (user.role === 'student' && (selectedGroup || selectedParent)) {
+    // Crear o actualizar en tabla `students`
+    api.put('/students.php', {
+      user_id: user.id,
+      group_id: selectedGroup || null,
+      parent_id: selectedParent || null
+    })
+      .then(() => {
+        setSnackbar({
+          open: true,
+          message: 'Estudiante vinculado correctamente',
+          severity: 'success'
+        });        
+        onClose();
+      })
+      .catch(err => {
+        console.error('Error al vincular al estudiante:', err);
+        setSnackbar({
+          open: true,
+          message: 'Error al vincular al grupo y al padre',
+          severity: 'error'
+        });
+      });
+
+  } else {
+    setSnackbar({
+      open: true,
+      message: 'Debe seleccionar un grupo o un padre (si es estudiante)',
+      severity: 'warning'
+    });
+  }
+};
   return (
     <>
       <Dialog open={open} onClose={onClose}>
