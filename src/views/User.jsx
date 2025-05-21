@@ -62,9 +62,9 @@ function User({ onLogout }) {
         <Container sx={{ backgroundColor: '#fff', borderRadius: 2, padding: 3, mt: 5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
             <Avatar
-              sx={{ width: 120, height: 120 }}
+              sx={{ width: 150, height: 150 }}
               src={`${API_BASE}/profile_photo/${userId}.jpg`}
-              alt="Foto de perfil"
+              alt= {`${userData.name} ${userData.surname}`}
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = `${API_BASE}/profile_photo/default.jpg`; // Imagen por defecto en caso de error
@@ -72,8 +72,18 @@ function User({ onLogout }) {
             />
           </Box>
           
-          <Typography variant="h5" align="center">{`${userData.firstName} ${userData.lastName}`}</Typography>
+          <Typography variant="h5" align="center">{`${userData.name} ${userData.surname}`}</Typography>
           <Typography variant="body1" align="center">{`Correo: ${userData.email}`}</Typography>
+          <Typography variant="body1" align="center">
+            {`Tipo de usuario: ${
+              {
+                student: 'Estudiante',
+                teacher: 'Profesor',
+                admin: 'Administrador',
+                parent: 'Padre'
+              }[userData.role] || 'Desconocido'
+            }`}
+          </Typography>
 
           {/* Mostrar grupo y padre si existen */}
           {userData.group && (
