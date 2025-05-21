@@ -11,9 +11,9 @@ import Badge from '@mui/material/Badge';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import defaultUserImage from '../assets/default-user.png';
 import { useNavigate } from 'react-router-dom';
-import API_BASE from '../api/config';
+import api from '../api/axios'; 
 
-const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenPhotoUpdate }) => {
+const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate }) => {
   const isMobile = useMediaQuery('(max-width:1050px)');
   const navigate = useNavigate();
 
@@ -22,8 +22,8 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenPh
   useEffect(() => {
     const fetchUnreadMessages = async () => {
       try {
-        const response = await fetch(`${API_BASE}/messages.php`);
-        const data = await response.json();
+        const response = await api.get('/messages.php');
+        const data = response.data;
         const userId = localStorage.getItem('EducaCenterId');
 
         const unreadExists = data.some(
@@ -44,8 +44,8 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenPh
       position="static"
       elevation={3}
       sx={{
-        backgroundColor: '#1E3A8A', // azul marino
-        color: '#FFFFFF',           // texto blanco
+        backgroundColor: '#1E3A8A',
+        color: '#FFFFFF',
         paddingY: 2,
       }}
     >
@@ -138,7 +138,7 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenPh
 
           <Box sx={{ display: 'flex', gap: 1.5 }}>
             <IconButton
-              onClick={onMessages}
+              onClick={() => navigate('/mensajes')}
               sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' } }}
             >
               <Badge

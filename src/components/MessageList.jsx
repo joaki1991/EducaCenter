@@ -11,56 +11,65 @@ import {
 import MailIcon from '@mui/icons-material/MailOutline';
 
 function MessageList({ messages, onMessageClick }) {
-    return (
-      <List>
-        {messages.map((msg, index) => {
-          const isRead = msg.is_read === 1 || msg.is_read === true;
-  
-          return (
-            <React.Fragment key={msg.id || index}>
-              <ListItem
-                alignItems="flex-start"
-                sx={{
-                  backgroundColor: isRead ? 'transparent' : 'rgba(0, 0, 0, 0.04)',
-                  cursor: 'pointer',
-                }}
-                onClick={() => onMessageClick(msg)}
-              >
-                <ListItemAvatar>
-                  <Avatar>
-                    <MailIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={
+  return (
+    <List>
+      {messages.map((msg, index) => {
+        const isRead = msg.is_read === 1 || msg.is_read === true;
+
+        return (
+          <React.Fragment key={msg.id || index}>
+            <ListItem
+              alignItems="flex-start"
+              sx={{
+                backgroundColor: isRead ? 'transparent' : 'rgba(0, 0, 0, 0.04)',
+                cursor: 'pointer',
+              }}
+              onClick={() => onMessageClick(msg)}
+            >
+              <ListItemAvatar>
+                <Avatar>
+                  <MailIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={isRead ? 'normal' : 'bold'}
+                    component="span"
+                  >
+                    {msg.subject || 'Sin asunto'}
+                  </Typography>
+                }
+                secondary={
+                  <>
                     <Typography
-                      variant="subtitle1"
+                      variant="body2"
+                      color="textSecondary"
                       fontWeight={isRead ? 'normal' : 'bold'}
+                      component="span"
+                      sx={{ display: 'block', marginBottom: 0.5 }}
                     >
-                      {msg.subject || 'Sin asunto'}
+                      {msg.body?.slice(0, 100) || 'Sin contenido'}...
                     </Typography>
-                  }
-                  secondary={
-                    <>
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        fontWeight={isRead ? 'normal' : 'bold'}
-                      >
-                        {msg.body?.slice(0, 100) || 'Sin contenido'}...
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary" display="block">
-                        Enviado por: {msg.sender_name || msg.sender_id} | Fecha: {msg.created_at || '---'}
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-              <Divider component="li" />
-            </React.Fragment>
-          );
-        })}
-      </List>
-    );
-  }
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      component="span"
+                      sx={{ display: 'block' }}
+                    >
+                      Enviado por: {msg.sender_name || msg.sender_id} | Fecha: {msg.created_at || '---'}
+                    </Typography>
+                  </>
+                }
+              />
+            </ListItem>
+            <Divider component="li" />
+          </React.Fragment>
+        );
+      })}
+    </List>
+  );
+}
+
 export default MessageList;

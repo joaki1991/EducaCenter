@@ -11,7 +11,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import API_BASE from '../../api/config';
+import api from '../../api/axios'; 
 
 function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
   const [recipientId, setRecipientId] = useState('');
@@ -21,35 +21,22 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
 
   useEffect(() => {
     if (open) {
-      // Solo cargamos los usuarios cuando se abre el diálogo
-      fetch(`${API_BASE}/users.php`)
-        .then((res) => res.json())
-        .then((data) => {
-          setUsers(data);
-        })
-        .catch((err) => {
-          console.error('Error al obtener usuarios:', err);
-        });
+      api.get('/users.php')
+        .then((res) => setUsers(res.data))
+        .catch((err) => console.error('Error al obtener usuarios:', err));
     }
   }, [open]);
 
   const handleSend = async () => {
     try {
-      const response = await fetch(`${API_BASE}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender_id: senderId,
-          recipient_id: recipientId,
-          subject,
-          body,
-        }),
+      const response = await api.post('/messages.php', {
+        sender_id: senderId,
+        receiver_id: recipientId,
+        subject,
+        body,
       });
 
-      if (!response.ok) throw new Error('Error al enviar mensaje');
-
-      const newMessage = await response.json();
-      onMessageSent(newMessage);
+      onMessageSent(response.data); // Pasas el mensaje recién creado
       handleClose();
     } catch (error) {
       console.error(error);
@@ -77,7 +64,7 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
             onChange={(e) => setRecipientId(e.target.value)}
           >
             {users
-              .filter((user) => user.id !== parseInt(senderId))
+              .filter((user) => user.id !== Number(senderId))
               .map((user) => (
                 <MenuItem key={user.id} value={user.id}>
                   {user.name} {user.surname}

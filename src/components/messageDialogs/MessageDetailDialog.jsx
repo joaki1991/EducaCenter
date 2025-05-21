@@ -29,6 +29,7 @@ function MessageDetailDialog({ open, onClose, message }) {
       </AppBar>
       <Box sx={{ padding: 3 }}>
         <Typography variant="h6">De: {message?.sender_name || message?.sender_id}</Typography>
+        <Typography variant="h6">Para: {message?.receiver_name || message?.receiver_id}</Typography>
         <Typography variant="subtitle2" gutterBottom>
           Fecha: {message?.created_at}
         </Typography>

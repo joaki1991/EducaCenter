@@ -11,7 +11,7 @@ import Header from '../components/Header';
 import SidePanelLayout from '../components/SidePanelLayout';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
-import API_BASE from '../api/config';
+import api from '../api/axios'; 
 import UpdateProfilePhoto from '../components/UpdateProfilePhoto';
 import MessageList from '../components/MessageList';
 import NewMessageDialog from '../components/messageDialogs/NewMessageDialog';
@@ -25,12 +25,12 @@ function Messages({ onLogout }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
 
   const user = localStorage.getItem('EducaCenterUser');
-  const userId = localStorage.getItem('EducaCenterId');
+  const userId = Number(localStorage.getItem('EducaCenterId'));
 
   const header = (
     <Header
       userName={user || 'Usuario'}
-      userImage={`${API_BASE}/profile_photo/${userId}.jpg`}
+      userImage={`${import.meta.env.VITE_API_BASE}/profile_photo/${userId}.jpg`}
       onLogout={onLogout}
       onMessages={() => console.log('Messages')}
       logoImage={logo}
@@ -38,18 +38,29 @@ function Messages({ onLogout }) {
     />
   );
 
+  // Creamos la función para recargar mensajes
+  const fetchMessages = async () => {
+    try {
+      const response = await api.get('/messages.php');
+      setMessages(response.data);
+    } catch (error) {
+      console.error('Error cargando mensajes:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
   const handleCloseMessageDialog = async () => {
-    if (selectedMessage && selectedMessage.is_read !== 1) {
+    if (selectedMessage && selectedMessage.is_read !== 1 && selectedMessage.receiver_id === userId) {
+      // Si el mensaje no está leído y es para el usuario, lo marcamos como leído
       try {
-        await fetch(`${API_BASE}/messages.php`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ id: selectedMessage.id, is_read: 1 }),
+        await api.put('/messages.php', {
+          id: selectedMessage.id,
+          is_read: 1,
         });
-  
-        // Marca el mensaje como leído localmente
+
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === selectedMessage.id ? { ...msg, is_read: 1 } : msg
@@ -59,26 +70,14 @@ function Messages({ onLogout }) {
         console.error('Error al actualizar is_read:', error);
       }
     }
-  
+
     setSelectedMessage(null);
   };
 
-  useEffect(() => {
-    async function fetchMessages() {
-      try {
-        const response = await fetch(`${API_BASE}/messages`);
-        const data = await response.json();
-        setMessages(data);
-      } catch (error) {
-        console.error('Error cargando mensajes:', error);
-      }
-    }
-
-    fetchMessages();
-  }, []);
-
   const filteredMessages = messages.filter((msg) =>
-    tab === 0 ? msg.sender_id !== userId : msg.sender_id === userId
+    tab === 0
+      ? msg.receiver_id === userId // Entrada
+      : msg.sender_id === userId   // Salida
   );
 
   return (
@@ -134,11 +133,15 @@ function Messages({ onLogout }) {
         onClose={handleCloseMessageDialog}
         message={selectedMessage}
       />
-      
+
       <NewMessageDialog
         open={newMessageOpen}
         onClose={() => setNewMessageOpen(false)}
-        onMessageSent={(newMsg) => setMessages((prev) => [...prev, newMsg])}
+        onMessageSent={async () => {
+          // En vez de sólo añadir el mensaje nuevo, recargamos la lista entera
+          await fetchMessages();
+          setNewMessageOpen(false);
+        }}
         senderId={userId}
       />
 
