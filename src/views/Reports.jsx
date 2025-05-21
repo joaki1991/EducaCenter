@@ -5,11 +5,9 @@ import SidePanelLayout from '../components/SidePanelLayout';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
 import API_BASE from '../api/config';
-import NewPasswordDialog from '../components/NewPasswordDialog';
 import UpdateProfilePhoto from '../components/UpdateProfilePhoto';
 
 function Reports({ onLogout }) {
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
 
   const user = localStorage.getItem('EducaCenterUser');
@@ -22,7 +20,6 @@ function Reports({ onLogout }) {
       onLogout={onLogout}
       onMessages={() => console.log('Messages')}
       logoImage={logo}
-      onOpenSettings={() => setSettingsOpen(true)}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />
   );
@@ -40,12 +37,6 @@ function Reports({ onLogout }) {
       <SidePanelLayout header={header}>
         
       </SidePanelLayout>
-
-      <NewPasswordDialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        userId={userId}
-      />
 
       <UpdateProfilePhoto
         open={photoDialogOpen}

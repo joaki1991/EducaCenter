@@ -11,7 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import defaultUserImage from '../assets/default-user.png'; 
 import { useNavigate } from 'react-router-dom';
 
-const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSettings, onOpenPhotoUpdate }) => {
+const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenPhotoUpdate }) => {
   
   const isMobile = useMediaQuery('(max-width:1050px)');
   const navigate = useNavigate();
@@ -87,7 +87,7 @@ const Header = ({ userName, userImage, onLogout, onMessages, logoImage, onOpenSe
                 {userName?.[0]}
               </Avatar>
             </IconButton>
-            <IconButton onClick={onOpenSettings} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' }, borderRadius: 8 }}>
+            <IconButton onClick={() => navigate('/usuario')} sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' }, borderRadius: 8 }}>
               <Typography
                 variant="body3"
                 noWrap
