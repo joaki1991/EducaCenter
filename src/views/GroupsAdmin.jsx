@@ -5,7 +5,6 @@ import SidePanelLayout from '../components/SidePanelLayout';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
 import API_BASE from '../api/config';
-import NewPasswordDialog from '../components/NewPasswordDialog';
 import UpdateProfilePhoto from '../components/UpdateProfilePhoto';
 import GroupsPanel from '../components/GroupsPanel'; // Panel para mostrar grupos
 import api from '../api/axios'; 
@@ -14,7 +13,6 @@ import EditGroupDialog from '../components/groupsDialogs/EditGroupDialog';
 import DeleteGroupDialog from '../components/groupsDialogs/DeleteGroupDialog'; 
 
 function GroupsAdmin({ onLogout }) {
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +69,6 @@ function GroupsAdmin({ onLogout }) {
       onLogout={onLogout}
       onMessages={() => console.log('Messages')}
       logoImage={logo}
-      onOpenSettings={() => setSettingsOpen(true)}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />
   );
@@ -167,11 +164,6 @@ function GroupsAdmin({ onLogout }) {
       />
 
       {/* Diálogos existentes */}
-      <NewPasswordDialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        userId={userId}
-      />
 
       <UpdateProfilePhoto
         open={photoDialogOpen}

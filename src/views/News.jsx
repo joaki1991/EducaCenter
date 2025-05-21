@@ -7,7 +7,6 @@ import NewsPanel from '../components/NewsPanel';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
 import API_BASE from '../api/config';
-import NewPasswordDialog from '../components/NewPasswordDialog';
 import UpdateProfilePhoto from '../components/UpdateProfilePhoto';
 import AddNewDialog from '../components/newsDialogs/AddNewDialog';
 import EditNewDialog from '../components/newsDialogs/EditNewDialog';
@@ -15,7 +14,6 @@ import DeleteNewDialog from '../components/newsDialogs/DeleteNewDialog';
 import AttachNewDialog from '../components/newsDialogs/AttachNewDialog';
 
 function News({ onLogout }) {
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -36,7 +34,6 @@ function News({ onLogout }) {
       onLogout={onLogout}
       onMessages={() => console.log('Messages')}
       logoImage={logo}
-      onOpenSettings={() => setSettingsOpen(true)}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />
   );
@@ -114,11 +111,6 @@ function News({ onLogout }) {
       )}
 
       {/* Configuración y foto */}
-      <NewPasswordDialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        userId={userId}
-      />
 
       <UpdateProfilePhoto
         open={photoDialogOpen}
