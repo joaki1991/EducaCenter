@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -6,6 +6,10 @@ import {
   DialogActions,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import API_BASE from '../../api/config';
 
@@ -13,6 +17,21 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
   const [recipientId, setRecipientId] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    if (open) {
+      // Solo cargamos los usuarios cuando se abre el diálogo
+      fetch(`${API_BASE}/users.php`)
+        .then((res) => res.json())
+        .then((data) => {
+          setUsers(data);
+        })
+        .catch((err) => {
+          console.error('Error al obtener usuarios:', err);
+        });
+    }
+  }, [open]);
 
   const handleSend = async () => {
     try {
@@ -49,14 +68,24 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Nuevo Mensaje</DialogTitle>
       <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="ID del destinatario"
-          fullWidth
-          value={recipientId}
-          onChange={(e) => setRecipientId(e.target.value)}
-        />
+        <FormControl fullWidth margin="dense">
+          <InputLabel id="recipient-label">Destinatario</InputLabel>
+          <Select
+            labelId="recipient-label"
+            value={recipientId}
+            label="Destinatario"
+            onChange={(e) => setRecipientId(e.target.value)}
+          >
+            {users
+              .filter((user) => user.id !== parseInt(senderId))
+              .map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.name} {user.surname}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+
         <TextField
           margin="dense"
           label="Asunto"
