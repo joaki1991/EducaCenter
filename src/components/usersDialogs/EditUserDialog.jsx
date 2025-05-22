@@ -67,7 +67,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
       password: formData.password || ''
     };
 
-    api.put('/users.php', payload) // Cambié de POST a PUT aquí
+    api.put('/users.php', payload) 
       .then(() => {
         setSnackbar({
           open: true,
@@ -75,12 +75,11 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
           severity: 'success'
         });
 
-        // Llamamos a la función onUserUpdated si se ha pasado
         if (typeof onUserUpdated === 'function') {
-          onUserUpdated(); // Notifica al componente padre para que recargue la lista de usuarios
+          onUserUpdated();
         }
-
-        handleCancel(); // Limpia el formulario
+        handleCancel();
+        onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
         console.error('Error al editar el usuario:', err);
@@ -95,7 +94,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
   const handleCancel = () => {
     setFormData({ name: '', surname: '', email: '', role: '', password: '' });
     setErrors({});
-    onClose(); // Cierra el modal
+    onClose(false); // Solo cierra, no recarga
   };
 
   return (

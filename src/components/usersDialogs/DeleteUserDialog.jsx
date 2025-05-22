@@ -20,7 +20,7 @@ const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
 
   const handleDelete = () => {
       api.delete('/users.php', {
-        data: { id: user.id } // El id va en el body como JSON
+        data: { id: user.id }
       })
       .then(()=> {
         setSnackbar({
@@ -28,12 +28,10 @@ const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
           message: 'Usuario eliminado correctamente',
           severity: 'success'
         });
-        
-        // Llamamos al método que recargará la lista de usuarios en el componente principal
         if (typeof onUserDeleted === 'function') {
-          onUserDeleted(); // Recargar usuarios o realizar cualquier otra acción
+          onUserDeleted();
         }
-        onClose(); // Cerramos el modal
+        onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
         console.error('Error al eliminar el usuario:', err);
@@ -47,7 +45,7 @@ const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
 
   return (
     <>
-      <Dialog open={open} onClose={onClose}>
+      <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Confirmación de eliminación</DialogTitle>
         <DialogContent>
           {user ? (
