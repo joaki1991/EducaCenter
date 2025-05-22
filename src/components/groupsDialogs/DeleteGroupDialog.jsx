@@ -20,7 +20,7 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
 
   const handleDelete = () => {
       api.delete('/groups.php', {
-        data: { id: group.id } // El id va en el body como JSON
+        data: { id: group.id }
       })
       .then(() => {
         setSnackbar({
@@ -28,12 +28,10 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
           message: 'Grupo eliminado correctamente',
           severity: 'success'
         });
-
-        // Llamamos al método que recargará la lista de grupos en el componente principal
         if (typeof onGroupDeleted === 'function') {
-          onGroupDeleted(); // Recargar grupos o realizar cualquier otra acción
+          onGroupDeleted();
         }
-        onClose(); // Cerramos el modal
+        onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
         console.error('Error al eliminar el grupo:', err);
@@ -47,7 +45,7 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
 
   return (
     <>
-      <Dialog open={open} onClose={onClose}>
+      <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Confirmación de eliminación</DialogTitle>
         <DialogContent>
          {group ? (

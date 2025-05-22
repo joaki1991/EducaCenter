@@ -147,18 +147,27 @@ function GroupsAdmin({ onLogout }) {
       {/* Diálogos para grupos */}
       <AddGroupDialog
         open={addGroupDialogOpen}
-        onClose={() => { setAddGroupDialogOpen(false); reloadGroups(); }}
+        onClose={(updated) => {
+          setAddGroupDialogOpen(false);
+          if (updated) reloadGroups();
+        }}
         type="add"
       />
       <EditGroupDialog
         open={editGroupDialogOpen}
-        onClose={() => { setEditGroupDialogOpen(false); reloadGroups(); }}
+        onClose={(updated) => {
+          setEditGroupDialogOpen(false);
+          if (updated) reloadGroups();
+        }}
         type="edit"
         group={selectedGroup}
       />
       <DeleteGroupDialog
         open={deleteGroupDialogOpen}
-        onClose={() => { setDeleteGroupDialogOpen(false); reloadGroups(); }}
+        onClose={(updated) => {
+          setDeleteGroupDialogOpen(false);
+          if (updated) reloadGroups();
+        }}
         type="delete"
         group={selectedGroup}
       />
