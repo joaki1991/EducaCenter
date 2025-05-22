@@ -26,11 +26,12 @@ function Messages({ onLogout }) {
 
   const user = localStorage.getItem('EducaCenterUser');
   const userId = Number(localStorage.getItem('EducaCenterId'));
+  const userIdPhoto = localStorage.getItem('EducaCenterId');
 
   const header = (
     <Header
       userName={user || 'Usuario'}
-      userImage={`${import.meta.env.VITE_API_BASE}/profile_photo/${userId}.jpg`}
+      userImage={`${import.meta.env.VITE_API_BASE}/profile_photo/${userIdPhoto}.jpg`}
       onLogout={onLogout}
       onMessages={() => console.log('Messages')}
       logoImage={logo}

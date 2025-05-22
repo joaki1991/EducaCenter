@@ -27,7 +27,7 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
         const userId = localStorage.getItem('EducaCenterId');
 
         const unreadExists = data.some(
-          (msg) => msg.sender_id !== Number(userId) && msg.is_read !== 1
+          (msg) => msg.receiver_id === Number(userId) && msg.is_read !== 1
         );
 
         setHasUnreadMessages(unreadExists);
