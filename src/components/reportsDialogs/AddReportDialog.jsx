@@ -31,10 +31,11 @@ const AddReportDialog = ({ open, onClose }) => {
     severity: 'success'
   });
 
-  const teacherId = localStorage.getItem('EducaCenterId');
+  const [teacherId, setTeacherId] = useState(null);
 
   useEffect(() => {
     if (open) {
+      // Obtener estudiantes
       api.get('/students.php')
         .then(res => setStudents(res.data))
         .catch(err => {
@@ -42,6 +43,30 @@ const AddReportDialog = ({ open, onClose }) => {
           setSnackbar({
             open: true,
             message: 'Error al cargar estudiantes',
+            severity: 'error'
+          });
+        });
+
+      // Obtener el ID del teacher asociado al usuario logueado
+      const userId = localStorage.getItem('EducaCenterId');
+      api.get(`/teachers.php?user_id=${userId}`)
+        .then(res => {
+          if (Array.isArray(res.data) && res.data.length > 0) {
+            setTeacherId(res.data[0].id);
+          } else {
+            console.error('No se encontró el teacher con ese user_id');
+            setSnackbar({
+              open: true,
+              message: 'No se pudo identificar al profesor',
+              severity: 'error'
+            });
+          }
+        })
+        .catch(err => {
+          console.error('Error al obtener teacher_id:', err);
+          setSnackbar({
+            open: true,
+            message: 'Error al identificar al profesor',
             severity: 'error'
           });
         });
@@ -63,6 +88,14 @@ const AddReportDialog = ({ open, onClose }) => {
 
   const handleSubmit = () => {
     if (!validate()) return;
+    if (!teacherId) {
+      setSnackbar({
+        open: true,
+        message: 'No se puede enviar el informe sin identificar al profesor',
+        severity: 'error'
+      });
+      return;
+    }
 
     const payload = {
       student_id: formData.student_id,
@@ -118,7 +151,7 @@ const AddReportDialog = ({ open, onClose }) => {
               >
                 {students.map((student) => (
                   <MenuItem key={student.id} value={student.id}>
-                    {student.name}
+                    {student.name || student.id}
                   </MenuItem>
                 ))}
               </Select>

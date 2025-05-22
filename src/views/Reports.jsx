@@ -41,43 +41,66 @@ function Reports({ onLogout }) {
     />
   );
 
-  const fetchReports = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      let response;
-      if (role === 'admin') {
-        response = await api.get('/reports');
-      } else if (role === 'teacher') {
-        response = await api.get(`/reports?teacher_id=${userId}`);
-      } else if (role === 'student') {
-        response = await api.get(`/reports?student_id=${userId}`);
-      } else if (role === 'parent') {
-        const childrenRes = await api.get(`/students?parent_id=${userId}`);
-        const children = childrenRes.data;
-        if (children.length === 0) {
-          setReports([]);
-          return;
-        }
-        const promises = children.map(child =>
-          api.get(`/reports?student_id=${child.id}`).then(res =>
-            res.data.map(report => ({ ...report, student_name: child.name }))
-          )
-        );
-        const allReports = (await Promise.all(promises)).flat();
-        setReports(allReports);
+const fetchReports = React.useCallback(async () => {
+  setLoading(true);
+  try {
+    let response;
+
+    if (role === 'admin') {
+      response = await api.get('/reports.php');
+    } else if (role === 'teacher') {
+      const res = await api.get(`/teachers.php?user_id=${userId}`);
+      const teacher = res.data[0];
+      if (teacher) {
+        response = await api.get(`/reports.php?teacher_id=${teacher.id}`);
+      } else {
+        setReports([]);
+        return;
+      }
+    } else if (role === 'student') {
+      const res = await api.get(`/students.php?user_id=${userId}`);
+      const student = res.data[0];
+      if (student) {
+        response = await api.get(`/reports.php?student_id=${student.id}`);
+      } else {
+        setReports([]);
+        return;
+      }
+    } else if (role === 'parent') {
+      const res = await api.get(`/parents.php?user_id=${userId}`);
+      const parent = res.data[0];
+      if (!parent) {
+        setReports([]);
         return;
       }
 
-      if (response) {
-        setReports(response.data);
+      const childrenRes = await api.get(`/students.php?parent_id=${parent.id}`);
+      const children = childrenRes.data;
+      if (children.length === 0) {
+        setReports([]);
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      setError('Error al cargar los informes');
-    } finally {
-      setLoading(false);
+
+      const promises = children.map(child =>
+        api.get(`/reports.php?student_id=${child.id}`).then(res =>
+          res.data.map(report => ({ ...report, student_name: child.name }))
+        )
+      );
+      const allReports = (await Promise.all(promises)).flat();
+      setReports(allReports);
+      return;
     }
-  }, [role, userId]);
+
+    if (response) {
+      setReports(response.data);
+    }
+  } catch (err) {
+    console.error(err);
+    setError('Error al cargar los informes');
+  } finally {
+    setLoading(false);
+  }
+}, [role, userId]);
 
   useEffect(() => {
     fetchReports();

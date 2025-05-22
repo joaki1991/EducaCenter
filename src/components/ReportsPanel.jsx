@@ -30,11 +30,12 @@ const ReportsPanel = ({
   onDelete,
   onView
 }) => {
+  const userRole = localStorage.getItem('EducaCenterRole');
   return (
     <Box p={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Informes Académicos</Typography>
-        {isEditable && (
+        {isEditable && userRole === "teacher" &&(
           <Button
             variant="contained"
             color="primary"
@@ -59,8 +60,8 @@ const ReportsPanel = ({
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Estudiante</TableCell>
-                <TableCell>Asignatura</TableCell>
+                {isEditable &&<TableCell>Estudiante</TableCell>}
+                <TableCell>Profesor</TableCell>
                 <TableCell>Fecha</TableCell>                
                 {isEditable && <TableCell align="center">Acciones</TableCell>}
                 <TableCell align="center">Visualizar</TableCell>
@@ -69,9 +70,9 @@ const ReportsPanel = ({
             <TableBody>
               {reports.map((report) => (
                 <TableRow key={report.id}>
-                  <TableCell>{report.student_name || report.student_id}</TableCell>
-                  <TableCell>{report.subject}</TableCell>
-                  <TableCell>{new Date(report.date).toLocaleDateString()}</TableCell>                  
+                  {isEditable &&<TableCell>{report.student_name || report.student_id}</TableCell>}
+                  <TableCell>{report.teacher_name || report.teacher_id}</TableCell>
+                  <TableCell>{new Date(report.created_at).toLocaleDateString()}</TableCell>                  
                   {isEditable && (
                     <TableCell align="center">
                       <IconButton
