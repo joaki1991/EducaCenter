@@ -36,7 +36,7 @@ const AddGroupDialog = ({ open, onClose }) => {
     if (!validate()) return;
 
     const payload = {
-      name: formData.name.trim()
+      name: formData.name.trim(),
     };
 
     api.post('/groups.php', payload)
@@ -46,9 +46,10 @@ const AddGroupDialog = ({ open, onClose }) => {
           message: 'Grupo añadido correctamente',
           severity: 'success'
         });
-        handleCancel(); // Limpia el formulario
+        handleCancel();
+        onClose(true); // Notifica al padre que debe recargar
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error al añadir grupo:', err);
         setSnackbar({
           open: true,
@@ -61,7 +62,7 @@ const AddGroupDialog = ({ open, onClose }) => {
   const handleCancel = () => {
     setFormData({ name: '' });
     setErrors({});
-    onClose();
+    onClose(false); // Solo cierra, no recarga
   };
 
   return (

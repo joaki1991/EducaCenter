@@ -62,6 +62,7 @@ const AddUserDialog = ({ open, onClose }) => {
         });               
   
         handleCancel(); // Limpia el formulario
+        onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
         console.error('Error al añadir usuario:', err);
@@ -76,7 +77,7 @@ const AddUserDialog = ({ open, onClose }) => {
   const handleCancel = () => {
     setFormData({ name: '', surname: '', email: '', role: '', password: '' });
     setErrors({});
-    onClose();
+    onClose(false); // Solo cierra, no recarga
   };
 
   return (

@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
-const EditGroupDialog = ({ open, onClose, group, onGroupUpdated }) => {
+const EditGroupDialog = ({ open, onClose, group }) => {
   const [formData, setFormData] = useState({
     name: ''
   });
@@ -49,25 +49,21 @@ const EditGroupDialog = ({ open, onClose, group, onGroupUpdated }) => {
       name: formData.name.trim()
     };
 
-    api.put('/groups.php', payload) 
+    api.put('/groups.php', payload)
       .then(() => {
         setSnackbar({
           open: true,
           message: 'Grupo editado correctamente',
           severity: 'success'
         });
-
-        if (typeof onGroupUpdated === 'function') {
-          onGroupUpdated(); 
-        }
-
-        handleCancel(); // Limpia el formulario
+        handleCancel();
+        onClose(true); // Notifica al padre que debe recargar
       })
-      .catch(err => {
-        console.error('Error al editar el grupo:', err);
+      .catch((err) => {
+        console.error('Error al editar grupo:', err);
         setSnackbar({
           open: true,
-          message: 'Error al editar el grupo',
+          message: 'Error al editar grupo',
           severity: 'error'
         });
       });
@@ -76,7 +72,7 @@ const EditGroupDialog = ({ open, onClose, group, onGroupUpdated }) => {
   const handleCancel = () => {
     setFormData({ name: '' });
     setErrors({});
-    onClose();
+    onClose(false); // Solo cierra, no recarga
   };
 
   return (

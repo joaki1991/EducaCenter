@@ -80,7 +80,7 @@ const handleSave = () => {
           message: 'Profesor vinculado al grupo correctamente',
           severity: 'success'
         });        
-        onClose();
+        onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
         console.error('Error al vincular el profesor:', err);
@@ -104,7 +104,7 @@ const handleSave = () => {
           message: 'Estudiante vinculado correctamente',
           severity: 'success'
         });        
-        onClose();
+        onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
         console.error('Error al vincular al estudiante:', err);
@@ -125,7 +125,7 @@ const handleSave = () => {
 };
   return (
     <>
-      <Dialog open={open} onClose={onClose}>
+      <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Vincular Usuario</DialogTitle>
         <DialogContent>
           {loading ? (

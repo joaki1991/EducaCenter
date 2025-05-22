@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
-const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
+const DeleteReportDialog = ({ open, onClose, report }) => {
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: '',
@@ -19,28 +19,25 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
   });
 
   const handleDelete = () => {
-      api.delete('/groups.php', {
-        data: { id: group.id }
-      })
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Grupo eliminado correctamente',
-          severity: 'success'
-        });
-        if (typeof onGroupDeleted === 'function') {
-          onGroupDeleted();
-        }
-        onClose(true); // Notifica al padre que debe recargar
-      })
-      .catch(err => {
-        console.error('Error al eliminar el grupo:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al eliminar el grupo',
-          severity: 'error'
-        });
+    api.delete('/reports.php', {
+      data: { id: report.id }
+    })
+    .then(() => {
+      setSnackbar({
+        open: true,
+        message: 'Informe eliminado correctamente',
+        severity: 'success'
       });
+      onClose(true); // Indica que debe recargarse la lista
+    })
+    .catch(err => {
+      console.error('Error al eliminar el informe:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al eliminar el informe',
+        severity: 'error'
+      });
+    });
   };
 
   return (
@@ -48,21 +45,26 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
       <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Confirmación de eliminación</DialogTitle>
         <DialogContent>
-         {group ? (
+          {report ? (
             <Typography variant="body1">
-              ¿Estás seguro de que deseas eliminar a {group.name} 
+              ¿Estás seguro de que deseas eliminar este informe?
             </Typography>
           ) : (
             <Typography variant="body1">
-              Cargando datos del grupo...
+              Cargando datos del informe...
             </Typography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="secondary">
+          <Button onClick={() => onClose(false)} color="secondary">
             Cancelar
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained" disabled={!group}>
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            disabled={!report}
+          >
             Borrar
           </Button>
         </DialogActions>
@@ -81,4 +83,4 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
   );
 };
 
-export default DeleteGroupDialog;
+export default DeleteReportDialog;

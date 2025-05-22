@@ -157,10 +157,22 @@ function UsersAdmin({ onLogout }) {
       </SidePanelLayout>
 
       {/* Diálogos externos */}
-      <AddUserDialog open={addDialogOpen} onClose={() => { setAddDialogOpen(false); reloadUsers(); }} />
-      <EditUserDialog open={editDialogOpen} onClose={() => { setEditDialogOpen(false); reloadUsers(); }} user={selectedUser} />
-      <DeleteUserDialog open={deleteDialogOpen} onClose={() => { setDeleteDialogOpen(false); reloadUsers(); }} user={selectedUser} />
-      <LinkUserDialog open={linkDialogOpen} onClose={() => { setLinkDialogOpen(false); reloadUsers(); }} user={selectedUser} />
+      <AddUserDialog open={addDialogOpen} onClose={(updated) => {
+        setAddDialogOpen(false);
+        if (updated) reloadUsers();
+      }} />
+      <EditUserDialog open={editDialogOpen} onClose={(updated) => {
+        setEditDialogOpen(false);
+        if (updated) reloadUsers();
+      }} user={selectedUser} />
+      <DeleteUserDialog open={deleteDialogOpen} onClose={(updated) => {
+        setDeleteDialogOpen(false);
+        if (updated) reloadUsers();
+      }} user={selectedUser} />
+      <LinkUserDialog open={linkDialogOpen} onClose={(updated) => {
+        setLinkDialogOpen(false);
+        if (updated) reloadUsers();
+      }} user={selectedUser} />
 
       {/* Diálogos existentes */}
 
