@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Box } from '@mui/material';
 import SidePanelLayout from '../components/SidePanelLayout';
@@ -14,74 +14,94 @@ import api from '../api/axios';
 
 function Absences({ onLogout }) {
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedAbsence, setSelectedAbsence] = useState(null);
+
   const [absences, setAbsences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedAbsence, setSelectedAbsence] = useState(null);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+  const user = localStorage.getItem('EducaCenterUser');
   const userId = localStorage.getItem('EducaCenterId');
   const role = localStorage.getItem('EducaCenterRole');
   const isEditable = role === 'admin' || role === 'teacher';
-
-  const fetchAbsences = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      let response;
-      if (role === 'admin') {
-        response = await api.get('/absences.php');
-      } else if (role === 'teacher') {
-        response = await api.get(`/absences.php?teacher_id=${userId}`);
-      } else if (role === 'student') {
-        response = await api.get(`/absences.php?student_id=${userId}`);
-      } else if (role === 'parent') {
-        // Buscar hijos y sus faltas
-        const childrenRes = await api.get(`/students?parent_id=${userId}`);
-        const children = childrenRes.data;
-        if (children.length === 0) {
-          setAbsences([]);
-          setLoading(false);
-          return;
-        }
-        const absencePromises = children.map(child =>
-          api.get(`/absences.php?student_id=${child.id}`)
-            .then(res => res.data)
-        );
-        const absenceResults = await Promise.all(absencePromises);
-        setAbsences(absenceResults.flat());
-        setLoading(false);
-        return;
-      }
-      setAbsences(response.data);
-    } catch {
-      setError('Error al cargar las faltas');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchAbsences();
-    // eslint-disable-next-line
-  }, [role, userId]);
-
-  const handleAdd = () => setAddDialogOpen(true);
-  const handleEdit = (absence) => { setSelectedAbsence(absence); setEditDialogOpen(true); };
-  const handleDelete = (absence) => { setSelectedAbsence(absence); setDeleteDialogOpen(true); };
-  const user = localStorage.getItem('EducaCenterUser');
 
   const header = (
     <Header
       userName={user || 'Usuario'}
       userImage={`${API_BASE}/profile_photo/${userId}.jpg`}
-      onLogout={onLogout}      
+      onLogout={onLogout}
       logoImage={logo}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />
   );
+
+  const fetchAbsences = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      let response;
+
+      if (role === 'admin') {
+        response = await api.get('/absences.php');
+      } else if (role === 'teacher') {
+        const res = await api.get(`/teachers.php?user_id=${userId}`);
+        const teacher = res.data[0];
+        if (teacher) {
+          response = await api.get(`/absences.php?teacher_id=${teacher.id}`);
+        } else {
+          setAbsences([]);
+          return;
+        }
+      } else if (role === 'student') {
+        const res = await api.get(`/students.php?user_id=${userId}`);
+        const student = res.data[0];
+        if (student) {
+          response = await api.get(`/absences.php?student_id=${student.id}`);
+        } else {
+          setAbsences([]);
+          return;
+        }
+      } else if (role === 'parent') {
+        const res = await api.get(`/parents.php?user_id=${userId}`);
+        const parent = res.data[0];
+        if (!parent) {
+          setAbsences([]);
+          return;
+        }
+
+        const childrenRes = await api.get(`/students.php?parent_id=${parent.id}`);
+        const children = childrenRes.data;
+        if (children.length === 0) {
+          setAbsences([]);
+          return;
+        }
+
+        const promises = children.map(child =>
+          api.get(`/absences.php?student_id=${child.id}`).then(res =>
+            res.data.map(abs => ({ ...abs, student_name: child.name }))
+          )
+        );
+        const allAbsences = (await Promise.all(promises)).flat();
+        setAbsences(allAbsences);
+        return;
+      }
+
+      if (response) {
+        setAbsences(response.data);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Error al cargar las faltas de asistencia');
+    } finally {
+      setLoading(false);
+    }
+  }, [role, userId]);
+
+  useEffect(() => {
+    fetchAbsences();
+  }, [fetchAbsences]);
 
   return (
     <Box
@@ -99,41 +119,46 @@ function Absences({ onLogout }) {
           loading={loading}
           error={error}
           isEditable={isEditable}
-          onAdd={handleAdd}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          onAdd={() => setAddOpen(true)}
+          onEdit={(absence) => {
+            setSelectedAbsence(absence);
+            setEditOpen(true);
+          }}
+          onDelete={(absence) => {
+            setSelectedAbsence(absence);
+            setDeleteOpen(true);
+          }}         
         />
       </SidePanelLayout>
+
+      <AddAbsenceDialog
+        open={addOpen}
+        onClose={(updated) => {
+          setAddOpen(false);
+          if (updated) fetchAbsences();
+        }}
+      />
+      <EditAbsenceDialog
+        open={editOpen}
+        absence={selectedAbsence}
+        onClose={(updated) => {
+          setEditOpen(false);
+          if (updated) fetchAbsences();
+        }}
+      />
+      <DeleteAbsenceDialog
+        open={deleteOpen}
+        absence={selectedAbsence}
+        onClose={(deleted) => {
+          setDeleteOpen(false);
+          if (deleted) fetchAbsences();
+        }}
+      />      
 
       <UpdateProfilePhoto
         open={photoDialogOpen}
         onClose={() => setPhotoDialogOpen(false)}
         userId={userId}
-      />
-      <AddAbsenceDialog
-        open={addDialogOpen}
-        onClose={(updated) => {
-          setAddDialogOpen(false);
-          if (updated) fetchAbsences();
-        }}
-        studentId={role === 'student' ? userId : undefined}
-        teacherId={role === 'teacher' ? userId : undefined}
-      />
-      <EditAbsenceDialog
-        open={editDialogOpen}
-        onClose={(updated) => {
-          setEditDialogOpen(false);
-          if (updated) fetchAbsences();
-        }}
-        absence={selectedAbsence}
-      />
-      <DeleteAbsenceDialog
-        open={deleteDialogOpen}
-        onClose={(updated) => {
-          setDeleteDialogOpen(false);
-          if (updated) fetchAbsences();
-        }}
-        absence={selectedAbsence}
       />
     </Box>
   );

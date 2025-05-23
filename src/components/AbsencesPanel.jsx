@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Box,
   Typography,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -9,28 +10,36 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
-  Button,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete } from '@mui/icons-material';
 
-const AbsencesPanel = ({ absences, loading, error, isEditable, onAdd, onEdit, onDelete }) => {
+const AbsencesPanel = ({
+  absences,
+  loading,
+  error,
+  isEditable,
+  onAdd,
+  onEdit,
+  onDelete
+}) => {
+  const userRole = localStorage.getItem('EducaCenterRole');
+
   return (
     <Box p={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">Faltas</Typography>
-        {isEditable && (
+        <Typography variant="h5">Faltas de Asistencia</Typography>
+        {isEditable && userRole === "teacher" && (
           <Button
             variant="contained"
             color="primary"
-            startIcon={<Add />}
             onClick={onAdd}
           >
             Añadir Falta
           </Button>
         )}
       </Box>
+
       {loading ? (
         <Box display="flex" justifyContent="center" mt={4}>
           <CircularProgress />
@@ -38,12 +47,14 @@ const AbsencesPanel = ({ absences, loading, error, isEditable, onAdd, onEdit, on
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : absences.length === 0 ? (
-        <Typography>No hay faltas registradas.</Typography>
+        <Typography>No hay faltas de asistencia registradas.</Typography>
       ) : (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
+                {isEditable && <TableCell>Estudiante</TableCell>}
+                <TableCell>Profesor</TableCell>
                 <TableCell>Fecha</TableCell>
                 <TableCell>Justificada</TableCell>
                 {isEditable && <TableCell align="center">Acciones</TableCell>}
@@ -52,16 +63,35 @@ const AbsencesPanel = ({ absences, loading, error, isEditable, onAdd, onEdit, on
             <TableBody>
               {absences.map((absence) => (
                 <TableRow key={absence.id}>
-                  <TableCell>{absence.date}</TableCell>
-                  <TableCell>{absence.justified ? 'Sí' : 'No'}</TableCell>
+                  {isEditable && <TableCell>{absence.student_name || absence.student_id}</TableCell>}
+                  <TableCell>{absence.teacher_name || absence.teacher_id}</TableCell>
+                  <TableCell>
+                    {absence.date && !isNaN(new Date(absence.date).getTime())
+                      ? new Date(absence.date).toLocaleDateString()
+                      : 'Fecha no válida'}
+                  </TableCell>
+                  <TableCell>{absence.justified === 1 ? 'Sí' : 'No'}</TableCell>
                   {isEditable && (
                     <TableCell align="center">
-                      <IconButton color="primary" size="small" onClick={() => onEdit(absence)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton color="error" size="small" onClick={() => onDelete(absence)}>
-                        <Delete />
-                      </IconButton>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        startIcon={<Edit />}
+                        onClick={() => onEdit(absence)}
+                        sx={{ mr: 1 }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        startIcon={<Delete />}
+                        onClick={() => onDelete(absence.id)}
+                      >
+                        Eliminar
+                      </Button>
                     </TableCell>
                   )}
                 </TableRow>

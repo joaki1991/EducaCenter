@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Box,
   Typography,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -10,15 +11,8 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  Button,
-  IconButton,
 } from '@mui/material';
-import {
-  Add,
-  Edit,
-  Delete,
-  Visibility
-} from '@mui/icons-material';
+import { Add, Edit, Delete } from '@mui/icons-material';
 
 const ReportsPanel = ({
   reports,
@@ -27,15 +21,15 @@ const ReportsPanel = ({
   isEditable,
   onAdd,
   onEdit,
-  onDelete,
-  onView
+  onDelete
 }) => {
   const userRole = localStorage.getItem('EducaCenterRole');
+
   return (
     <Box p={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Informes Académicos</Typography>
-        {isEditable && userRole === "teacher" &&(
+        {isEditable && userRole === "teacher" && (
           <Button
             variant="contained"
             color="primary"
@@ -60,46 +54,45 @@ const ReportsPanel = ({
           <Table>
             <TableHead>
               <TableRow>
-                {isEditable &&<TableCell>Estudiante</TableCell>}
+                {isEditable && <TableCell>Estudiante</TableCell>}
                 <TableCell>Profesor</TableCell>
-                <TableCell>Fecha</TableCell>                
+                <TableCell>Fecha</TableCell>
                 {isEditable && <TableCell align="center">Acciones</TableCell>}
-                <TableCell align="center">Visualizar</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {reports.map((report) => (
                 <TableRow key={report.id}>
-                  {isEditable &&<TableCell>{report.student_name || report.student_id}</TableCell>}
+                  {isEditable && <TableCell>{report.student_name || report.student_id}</TableCell>}
                   <TableCell>{report.teacher_name || report.teacher_id}</TableCell>
-                  <TableCell>{new Date(report.created_at).toLocaleDateString()}</TableCell>                  
+                  <TableCell>
+                    {report.created_at && !isNaN(new Date(report.created_at).getTime())
+                      ? new Date(report.created_at).toLocaleDateString()
+                      : 'Fecha no válida'}
+                  </TableCell>
                   {isEditable && (
                     <TableCell align="center">
-                      <IconButton
+                      <Button
+                        variant="outlined"
                         color="primary"
                         size="small"
+                        startIcon={<Edit />}
                         onClick={() => onEdit(report)}
+                        sx={{ mr: 1 }}
                       >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
+                        Editar
+                      </Button>
+                      <Button
+                        variant="outlined"
                         color="error"
                         size="small"
-                        onClick={() => onDelete(report)}
+                        startIcon={<Delete />}
+                        onClick={() => onDelete(report.id)}
                       >
-                        <Delete />
-                      </IconButton>
+                        Eliminar
+                      </Button>
                     </TableCell>
                   )}
-                  <TableCell align="center">
-                    <IconButton
-                      color="default"
-                      size="small"
-                      onClick={() => onView(report)}
-                    >
-                      <Visibility />
-                    </IconButton>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
