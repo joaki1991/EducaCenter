@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 import API_BASE from '../../api/config';
+import notFound from '../../assets/not-found.png'; // Importa la imagen prediseñada
 
 const AttachNewDialog = ({ open, onClose, announcement }) => {
   const announcementId = announcement?.id || null;
 
-  // Guardar timestamp solo cuando cambia el announcementId para evitar que cambie cada render
   const timestamp = useMemo(() => new Date().getTime(), []);
 
   const currentImageUrl = announcementId ? `${API_BASE}/announcement_photos/${announcementId}.jpg?${timestamp}` : null;
@@ -44,7 +44,8 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
         return;
       }
       setSelectedFile(file);
-      setPreview(URL.createObjectURL(file));
+      const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
     }
   };
 
@@ -66,7 +67,7 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
         severity: 'success',
       });
 
-      onClose(true); // Cierra modal y avisa que se actualizó (para recarga)
+      onClose(true);
     } catch (err) {
       console.error(err);
       setSnackbar({
@@ -83,22 +84,12 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
         <DialogTitle>Subir imagen de la noticia</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={1}>
-            {preview ? (
-              <img
-                src={preview}
-                alt="Vista previa"
-                style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8 }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  width: 120,
-                  height: 120,
-                  bgcolor: 'grey.300',
-                  borderRadius: 1,
-                }}
-              />
-            )}
+            <img
+              src={preview || notFound}
+              alt="Vista previa"
+              style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8 }}
+              onError={(e) => { e.target.src = notFound; }} // fallback si falla la carga de la imagen
+            />
             <input
               type="file"
               accept="image/jpeg,image/jpg"

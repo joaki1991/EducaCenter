@@ -12,10 +12,10 @@ import {
   Paper,
   CircularProgress,
 } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete } from '@mui/icons-material';
 
-const ReportsPanel = ({
-  reports,
+const AbsencesPanel = ({
+  absences,
   loading,
   error,
   isEditable,
@@ -28,15 +28,14 @@ const ReportsPanel = ({
   return (
     <Box p={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">Informes Académicos</Typography>
+        <Typography variant="h5">Faltas de Asistencia</Typography>
         {isEditable && userRole === "teacher" && (
           <Button
             variant="contained"
             color="primary"
-            startIcon={<Add />}
             onClick={onAdd}
           >
-            Añadir Informe
+            Añadir Falta
           </Button>
         )}
       </Box>
@@ -47,8 +46,8 @@ const ReportsPanel = ({
         </Box>
       ) : error ? (
         <Typography color="error">{error}</Typography>
-      ) : reports.length === 0 ? (
-        <Typography>No hay informes disponibles.</Typography>
+      ) : absences.length === 0 ? (
+        <Typography>No hay faltas de asistencia registradas.</Typography>
       ) : (
         <TableContainer component={Paper}>
           <Table>
@@ -57,19 +56,21 @@ const ReportsPanel = ({
                 {isEditable && <TableCell>Estudiante</TableCell>}
                 <TableCell>Profesor</TableCell>
                 <TableCell>Fecha</TableCell>
+                <TableCell>Justificada</TableCell>
                 {isEditable && <TableCell align="center">Acciones</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
-              {reports.map((report) => (
-                <TableRow key={report.id}>
-                  {isEditable && <TableCell>{report.student_name || report.student_id}</TableCell>}
-                  <TableCell>{report.teacher_name || report.teacher_id}</TableCell>
+              {absences.map((absence) => (
+                <TableRow key={absence.id}>
+                  {isEditable && <TableCell>{absence.student_name || absence.student_id}</TableCell>}
+                  <TableCell>{absence.teacher_name || absence.teacher_id}</TableCell>
                   <TableCell>
-                    {report.created_at && !isNaN(new Date(report.created_at).getTime())
-                      ? new Date(report.created_at).toLocaleDateString()
+                    {absence.date && !isNaN(new Date(absence.date).getTime())
+                      ? new Date(absence.date).toLocaleDateString()
                       : 'Fecha no válida'}
                   </TableCell>
+                  <TableCell>{absence.justified === 1 ? 'Sí' : 'No'}</TableCell>
                   {isEditable && (
                     <TableCell align="center">
                       <Button
@@ -77,7 +78,7 @@ const ReportsPanel = ({
                         color="primary"
                         size="small"
                         startIcon={<Edit />}
-                        onClick={() => onEdit(report)}
+                        onClick={() => onEdit(absence)}
                         sx={{ mr: 1 }}
                       >
                         Editar
@@ -87,7 +88,7 @@ const ReportsPanel = ({
                         color="error"
                         size="small"
                         startIcon={<Delete />}
-                        onClick={() => onDelete(report.id)}
+                        onClick={() => onDelete(absence.id)}
                       >
                         Eliminar
                       </Button>
@@ -103,4 +104,4 @@ const ReportsPanel = ({
   );
 };
 
-export default ReportsPanel;
+export default AbsencesPanel;

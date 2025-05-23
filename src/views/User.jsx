@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import { Box, Typography, Button, Container, Avatar, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Container,
+  Avatar,
+  CircularProgress
+} from '@mui/material';
 import SidePanelLayout from '../components/SidePanelLayout';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
@@ -13,6 +20,7 @@ function User({ onLogout }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [parentName, setParentName] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const userId = localStorage.getItem('EducaCenterId');
@@ -23,7 +31,13 @@ function User({ onLogout }) {
       try {
         const response = await api.get(`/users.php?id=${userId}`);
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          setUserData(response.data[0]); // Tomamos solo el primer (y único) usuario      
+          const user = response.data[0];
+          setUserData(user);
+
+          // Si el usuario es estudiante, buscar el nombre del padre
+          if (user.role === 'student') {
+            fetchParentData(user.id);
+          }
         } else {
           console.warn('Respuesta inesperada:', response.data);
         }
@@ -31,6 +45,30 @@ function User({ onLogout }) {
         console.error('Error al cargar datos del usuario:', err);
       } finally {
         setLoading(false);
+      }
+    };
+
+    const fetchParentData = async (studentUserId) => {
+      try {
+        const parentResponse = await api.get(`/parents.php?user_id=${studentUserId}`);
+        if (
+          parentResponse.data &&
+          Array.isArray(parentResponse.data) &&
+          parentResponse.data.length > 0
+        ) {
+          const parentId = parentResponse.data[0].parent_id;
+          const parentUser = await api.get(`/users.php?id=${parentId}`);
+          if (
+            parentUser.data &&
+            Array.isArray(parentUser.data) &&
+            parentUser.data.length > 0
+          ) {
+            const parent = parentUser.data[0];
+            setParentName(`${parent.name} ${parent.surname}`);
+          }
+        }
+      } catch (err) {
+        console.error('Error al cargar datos del padre:', err);
       }
     };
 
@@ -46,7 +84,6 @@ function User({ onLogout }) {
       userName={userData ? `${userData.name} ${userData.surname}` : 'Usuario'}
       userImage={`${API_BASE}/profile_photo/${userId}.jpg`}
       onLogout={onLogout}
-      onMessages={() => console.log('Messages')}
       logoImage={logo}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />
@@ -112,15 +149,21 @@ function User({ onLogout }) {
               }`}
             </Typography>
 
-            {userData.group && (
+            {userData.group_name && (
               <Typography variant="body1" align="center">
                 {`Grupo: ${userData.group_name || '-'}`}
               </Typography>
             )}
 
-            {userData.parent && (
+            {parentName && (
               <Typography variant="body1" align="center">
-                {`Padre: ${userData.parent_name || '-'}`}
+                {`Padre/Madre: ${parentName}`}
+              </Typography>
+            )}
+
+            {userData.created_at && (
+              <Typography variant="body1" align="center">
+                {`Fecha de alta: ${new Date(userData.created_at).toLocaleDateString()}`}
               </Typography>
             )}
           </Box>
