@@ -67,7 +67,6 @@ function GroupsAdmin({ onLogout }) {
       userName={user || 'Usuario'}
       userImage={`${API_BASE}/profile_photo/${userId}.jpg`}
       onLogout={onLogout}
-      onMessages={() => console.log('Messages')}
       logoImage={logo}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />

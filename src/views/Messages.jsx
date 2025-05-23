@@ -33,7 +33,6 @@ function Messages({ onLogout }) {
       userName={user || 'Usuario'}
       userImage={`${import.meta.env.VITE_API_BASE}/profile_photo/${userIdPhoto}.jpg`}
       onLogout={onLogout}
-      onMessages={() => console.log('Messages')}
       logoImage={logo}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />

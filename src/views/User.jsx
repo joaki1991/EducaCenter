@@ -84,7 +84,6 @@ function User({ onLogout }) {
       userName={userData ? `${userData.name} ${userData.surname}` : 'Usuario'}
       userImage={`${API_BASE}/profile_photo/${userId}.jpg`}
       onLogout={onLogout}
-      onMessages={() => console.log('Messages')}
       logoImage={logo}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}
     />
