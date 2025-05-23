@@ -29,7 +29,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
-    if (user) {
+    if (user && open) {
       // Si se pasa un usuario, actualizar el formulario con los datos del usuario
       setFormData({
         name: user.name || '',
@@ -39,7 +39,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
         password: user.password || '' 
       });
     }
-  }, [user]);
+  }, [user, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,9 +63,12 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
       name: formData.name.trim(),
       surname: formData.surname.trim(),
       email: formData.email?.trim() || '',
-      role: formData.role.trim(),
-      password: formData.password || ''
+      role: formData.role.trim(),      
     };
+    // Solo agrega la contraseña si el campo no está vacío
+    if (formData.password.trim()) {
+      payload.password = formData.password;
+    }
 
     api.put('/users.php', payload) 
       .then(() => {
@@ -164,6 +167,16 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
               type="password"
               value={formData.password}
               onChange={handleChange}
+              sx={{
+                backgroundColor: '#f0f0f0',
+                '& .MuiInputBase-root': {
+                  backgroundColor: '#f0f0f0',
+                  transition: 'background-color 0.3s ease',
+                },
+                '& .MuiInputBase-root.Mui-focused': {
+                  backgroundColor: '#ffffff',
+                }
+              }}
             />
           </Box>
         </DialogContent>
