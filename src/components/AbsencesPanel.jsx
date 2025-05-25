@@ -11,6 +11,7 @@ import {
   TableRow,
   Paper,
   CircularProgress,
+  Skeleton,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 
@@ -24,6 +25,9 @@ const AbsencesPanel = ({
   onDelete
 }) => {
   const userRole = localStorage.getItem('EducaCenterRole');
+
+  // Número de filas skeleton a mostrar
+  const skeletonRows = 5;
 
   return (
     <Box p={2}>
@@ -41,9 +45,44 @@ const AbsencesPanel = ({
       </Box>
 
       {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <CircularProgress />
-        </Box>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {isEditable && <TableCell><Skeleton width={80} /></TableCell>}
+                <TableCell><Skeleton width={80} /></TableCell>
+                <TableCell><Skeleton width={80} /></TableCell>
+                <TableCell><Skeleton width={80} /></TableCell>
+                {isEditable && <TableCell><Skeleton width={80} /></TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {[...Array(skeletonRows)].map((_, index) => (
+                <TableRow key={index}>
+                  {isEditable && (
+                    <TableCell>
+                      <Skeleton variant="rectangular" height={30} />
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <Skeleton variant="rectangular" height={30} />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="rectangular" height={30} />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="rectangular" height={30} />
+                  </TableCell>
+                  {isEditable && (
+                    <TableCell>
+                      <Skeleton variant="rectangular" height={30} />
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : absences.length === 0 ? (
