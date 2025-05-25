@@ -102,7 +102,7 @@ const ReportsPanel = ({
                         color="error"
                         size="small"
                         startIcon={<Delete />}
-                        onClick={() => onDelete(report.id)}
+                        onClick={() => onDelete(report)}
                       >
                         Eliminar
                       </Button>
