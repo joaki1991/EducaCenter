@@ -88,7 +88,7 @@ const AbsencesPanel = ({
                         color="error"
                         size="small"
                         startIcon={<Delete />}
-                        onClick={() => onDelete(absence.id)}
+                        onClick={() => onDelete(absence)}
                       >
                         Eliminar
                       </Button>

@@ -12,6 +12,7 @@ import SidePanelLayout from '../components/SidePanelLayout';
 import logo from '../assets/logo.png';
 import fondo from '../assets/fondo.png';
 import api from '../api/axios'; 
+import API_BASE from '../api/config';
 import UpdateProfilePhoto from '../components/UpdateProfilePhoto';
 import MessageList from '../components/MessageList';
 import NewMessageDialog from '../components/messageDialogs/NewMessageDialog';
@@ -26,12 +27,11 @@ function Messages({ onLogout }) {
 
   const user = localStorage.getItem('EducaCenterUser');
   const userId = Number(localStorage.getItem('EducaCenterId'));
-  const userIdPhoto = localStorage.getItem('EducaCenterId');
 
   const header = (
     <Header
       userName={user || 'Usuario'}
-      userImage={`${import.meta.env.VITE_API_BASE}/profile_photo/${userIdPhoto}.jpg`}
+      userImage={`${API_BASE}/profile_photo/${userId}.jpg`}
       onLogout={onLogout}
       logoImage={logo}
       onOpenPhotoUpdate={() => setPhotoDialogOpen(true)}

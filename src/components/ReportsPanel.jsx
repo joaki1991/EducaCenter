@@ -12,7 +12,7 @@ import {
   Paper,
   CircularProgress,
 } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 
 const ReportsPanel = ({
   reports,
@@ -21,7 +21,8 @@ const ReportsPanel = ({
   isEditable,
   onAdd,
   onEdit,
-  onDelete
+  onDelete,
+  onView
 }) => {
   const userRole = localStorage.getItem('EducaCenterRole');
 
@@ -57,6 +58,7 @@ const ReportsPanel = ({
                 {isEditable && <TableCell>Estudiante</TableCell>}
                 <TableCell>Profesor</TableCell>
                 <TableCell>Fecha</TableCell>
+                {onView && <TableCell align="center">Visualizar</TableCell>}
                 {isEditable && <TableCell align="center">Acciones</TableCell>}
               </TableRow>
             </TableHead>
@@ -70,6 +72,19 @@ const ReportsPanel = ({
                       ? new Date(report.created_at).toLocaleDateString()
                       : 'Fecha no válida'}
                   </TableCell>
+                  {onView && (
+                    <TableCell align="center">
+                      <Button
+                        variant="outlined"
+                        color="info"
+                        size="small"
+                        startIcon={<Visibility />}
+                        onClick={() => onView(report)}
+                      >
+                        Ver
+                      </Button>
+                    </TableCell>
+                  )}
                   {isEditable && (
                     <TableCell align="center">
                       <Button
