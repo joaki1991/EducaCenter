@@ -1,3 +1,7 @@
+// Vista de inicio de sesión
+// Permite al usuario autenticarse en la aplicación
+// Incluye formulario de login y manejo de errores
+
 import { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, CircularProgress, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -7,16 +11,23 @@ import backgroundImage from '../assets/background_login.png';
 import logo from '../assets/logo.png';
 
 export default function Login({ onLogin }) {
+  // Maneja el estado del email ingresado
   const [email, setEmail] = useState('');
+  // Maneja el estado de la contraseña ingresada
   const [password, setPassword] = useState('');
+  // Indica si se está procesando el login
   const [loading, setLoading] = useState(false);
+  // Almacena mensajes de error de login
   const [error, setError] = useState('');
+  // Controla la visibilidad de la contraseña
   const [showPassword, setShowPassword] = useState(false);
 
+  // Alterna la visibilidad de la contraseña
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
+  // Maneja el envío del formulario de login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);

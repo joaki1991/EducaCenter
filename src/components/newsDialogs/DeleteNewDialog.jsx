@@ -11,13 +11,18 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente DeleteNewDialog: diálogo para confirmar y eliminar una noticia
+// Muestra mensaje de confirmación y feedback de éxito o error
+// Realiza la petición a la API para eliminar la noticia
 const DeleteNewDialog = ({ open, onClose, announcement }) => {
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Maneja la eliminación de la noticia llamando a la API
   const handleDelete = () => {
     api.delete('/announcements.php', {
       data: { id: announcement.id }
@@ -28,10 +33,10 @@ const DeleteNewDialog = ({ open, onClose, announcement }) => {
         message: 'Anuncio eliminado correctamente',
         severity: 'success'
       });
-      
       onClose(true); // Notifica al padre que se debe recargar
     })
     .catch(err => {
+      // Manejo de error al eliminar el anuncio
       console.error('Error al eliminar el anuncio:', err);
       setSnackbar({
         open: true,

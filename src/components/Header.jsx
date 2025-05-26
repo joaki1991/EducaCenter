@@ -13,12 +13,18 @@ import defaultUserImage from '../assets/default-user.png';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios'; 
 
+// Componente Header: cabecera principal de la aplicación
+// Muestra el nombre e imagen del usuario, iconos de mensajes y logout, y el logo
+// Incluye lógica para mostrar si hay mensajes no leídos
 const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate }) => {
+  // Detecta si la pantalla es móvil para ajustar el layout
   const isMobile = useMediaQuery('(max-width:1050px)');
   const navigate = useNavigate();
 
+  // Estado para saber si hay mensajes no leídos
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
+  // Efecto para consultar si existen mensajes no leídos para el usuario
   useEffect(() => {
     const fetchUnreadMessages = async () => {
       try {
@@ -26,12 +32,14 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
         const data = response.data;
         const userId = localStorage.getItem('EducaCenterId');
 
+        // Verifica si hay algún mensaje no leído para el usuario actual
         const unreadExists = data.some(
           (msg) => msg.receiver_id === Number(userId) && msg.is_read !== 1
         );
 
         setHasUnreadMessages(unreadExists);
       } catch (error) {
+        // Manejo de error al consultar mensajes
         console.error('Error al comprobar mensajes no leídos:', error);
       }
     };
@@ -39,6 +47,7 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
     fetchUnreadMessages();
   }, []);
 
+  // Render principal del header con logo, usuario, iconos de mensajes y logout
   return (
     <AppBar
       position="static"
@@ -56,7 +65,7 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
           paddingX: 2,
         }}
       >
-        {/* Logo */}
+        {/* Logo de la aplicación */}
         <Box
           sx={{
             position: isMobile ? 'static' : 'absolute',
@@ -82,7 +91,7 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
           </Box>
         </Box>
 
-        {/* Usuario + Iconos */}
+        {/* Sección de usuario e iconos */}
         <Box
           sx={{
             display: 'flex',
@@ -93,6 +102,7 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
             gap: isMobile ? 1.5 : 0,
           }}
         >
+          {/* Avatar y nombre del usuario */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.5 }}>
             <IconButton>
               <Avatar
@@ -136,7 +146,9 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
             </IconButton>
           </Box>
 
+          {/* Iconos de mensajes y logout */}
           <Box sx={{ display: 'flex', gap: 1.5 }}>
+            {/* Icono de mensajes con badge si hay mensajes no leídos */}
             <IconButton
               onClick={() => navigate('/mensajes')}
               sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' } }}
@@ -151,6 +163,7 @@ const Header = ({ userName, userImage, onLogout, logoImage, onOpenPhotoUpdate })
               </Badge>
             </IconButton>
 
+            {/* Icono de logout */}
             <IconButton
               onClick={onLogout}
               sx={{ color: '#FFFFFF', '&:hover': { backgroundColor: '#1976d2' } }}

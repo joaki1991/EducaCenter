@@ -1,3 +1,6 @@
+// Componente LinkUserDialog: diálogo para vincular un usuario a un grupo o padre
+// Permite seleccionar grupo o padre según el rol y muestra feedback
+// Realiza la petición a la API para actualizar la vinculación
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -17,6 +20,7 @@ import {
 import api from '../../api/axios';
 
 const LinkUserDialog = ({ open, onClose, user }) => {
+  // Estados para grupos, padres, selección y feedback
   const [groups, setGroups] = useState([]);
   const [parents, setParents] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState('');
@@ -28,6 +32,7 @@ const LinkUserDialog = ({ open, onClose, user }) => {
     severity: 'success'
   });
 
+  // Efecto para cargar grupos y padres al abrir el diálogo
   useEffect(() => {
     if (open) {
       setLoading(true);
@@ -67,62 +72,66 @@ const LinkUserDialog = ({ open, onClose, user }) => {
     }
   }, [open, user]);
 
-const handleSave = () => {
-  if (user.role === 'teacher' && selectedGroup) {
-    // Crear o actualizar en tabla `teachers`
-    api.put('/teachers.php', {
-      user_id: user.id,
-      group_id: selectedGroup
-    })
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Profesor vinculado al grupo correctamente',
-          severity: 'success'
-        });        
-        onClose(true); // Notifica al padre que debe recargar
+  // Maneja el guardado de la vinculación según el rol
+  const handleSave = () => {
+    if (user.role === 'teacher' && selectedGroup) {
+      // Crear o actualizar en tabla `teachers`
+      api.put('/teachers.php', {
+        user_id: user.id,
+        group_id: selectedGroup
       })
-      .catch(err => {
-        console.error('Error al vincular el profesor:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al vincular al grupo',
-          severity: 'error'
+        .then(() => {
+          setSnackbar({
+            open: true,
+            message: 'Profesor vinculado al grupo correctamente',
+            severity: 'success'
+          });        
+          onClose(true); // Notifica al padre que debe recargar
+        })
+        .catch(err => {
+          // Manejo de error al vincular profesor
+          console.error('Error al vincular el profesor:', err);
+          setSnackbar({
+            open: true,
+            message: 'Error al vincular al grupo',
+            severity: 'error'
+          });
         });
-      });
 
-  } else if (user.role === 'student' && (selectedGroup || selectedParent)) {
-    // Crear o actualizar en tabla `students`
-    api.put('/students.php', {
-      user_id: user.id,
-      group_id: selectedGroup || null,
-      parent_id: selectedParent || null
-    })
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Estudiante vinculado correctamente',
-          severity: 'success'
-        });        
-        onClose(true); // Notifica al padre que debe recargar
+    } else if (user.role === 'student' && (selectedGroup || selectedParent)) {
+      // Crear o actualizar en tabla `students`
+      api.put('/students.php', {
+        user_id: user.id,
+        group_id: selectedGroup || null,
+        parent_id: selectedParent || null
       })
-      .catch(err => {
-        console.error('Error al vincular al estudiante:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al vincular al grupo y al padre',
-          severity: 'error'
+        .then(() => {
+          setSnackbar({
+            open: true,
+            message: 'Estudiante vinculado correctamente',
+            severity: 'success'
+          });        
+          onClose(true); // Notifica al padre que debe recargar
+        })
+        .catch(err => {
+          // Manejo de error al vincular estudiante
+          console.error('Error al vincular al estudiante:', err);
+          setSnackbar({
+            open: true,
+            message: 'Error al vincular al grupo y al padre',
+            severity: 'error'
+          });
         });
-      });
 
-  } else {
-    setSnackbar({
-      open: true,
-      message: 'Debe seleccionar un grupo o un padre (si es estudiante)',
-      severity: 'warning'
-    });
-  }
-};
+    } else {
+      // Validación si no se seleccionó grupo o padre
+      setSnackbar({
+        open: true,
+        message: 'Debe seleccionar un grupo o un padre (si es estudiante)',
+        severity: 'warning'
+      });
+    }
+  };
   return (
     <>
       <Dialog open={open} onClose={() => onClose(false)}>

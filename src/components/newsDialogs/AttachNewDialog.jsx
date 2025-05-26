@@ -14,24 +14,33 @@ import api from '../../api/axios';
 import API_BASE from '../../api/config';
 import notFound from '../../assets/not-found.png'; // Importa la imagen prediseñada
 
+// Componente AttachNewDialog: diálogo para adjuntar archivos a una noticia
+// Permite seleccionar y subir archivos JPG, muestra mensajes de éxito o error
+// Realiza la petición a la API para adjuntar el archivo a la noticia
 const AttachNewDialog = ({ open, onClose, announcement }) => {
+  // Obtiene el id del anuncio
   const announcementId = announcement?.id || null;
 
+  // Genera un timestamp para evitar caché en la imagen
   const timestamp = useMemo(() => new Date().getTime(), []);
 
+  // URL de la imagen actual del anuncio
   const currentImageUrl = announcementId ? `${API_BASE}/announcement_photos/${announcementId}.jpg?${timestamp}` : null;
 
+  // Estados para archivo seleccionado, vista previa, error y snackbar
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(currentImageUrl);
   const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Efecto para resetear vista previa y errores al abrir el diálogo
   useEffect(() => {
     setPreview(currentImageUrl);
     setSelectedFile(null);
     setError(null);
   }, [currentImageUrl, open]);
 
+  // Maneja el cambio de archivo seleccionado y valida que sea JPG
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setError(null);
@@ -49,6 +58,7 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
     }
   };
 
+  // Maneja la subida del archivo seleccionado
   const handleUpload = async () => {
     if (!selectedFile || !announcementId) return;
 
@@ -69,6 +79,7 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
 
       onClose(true);
     } catch (err) {
+      // Manejo de error al subir la imagen
       console.error(err);
       setSnackbar({
         open: true,

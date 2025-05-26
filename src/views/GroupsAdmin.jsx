@@ -1,3 +1,7 @@
+// Vista de administración de grupos
+// Permite ver, agregar, editar y eliminar grupos
+// Incluye panel de grupos y diálogos de gestión
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Skeleton } from '@mui/material';
@@ -13,19 +17,23 @@ import EditGroupDialog from '../components/groupsDialogs/EditGroupDialog';
 import DeleteGroupDialog from '../components/groupsDialogs/DeleteGroupDialog'; 
 
 function GroupsAdmin({ onLogout }) {
+  // Maneja la apertura/cierre del diálogo de foto de perfil
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  // Lista de grupos y estado de carga
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Estados para diálogos
+  // Estados para los diálogos de agregar, editar y eliminar grupo
   const [addGroupDialogOpen, setAddGroupDialogOpen] = useState(false);
   const [editGroupDialogOpen, setEditGroupDialogOpen] = useState(false);
   const [deleteGroupDialogOpen, setDeleteGroupDialogOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
+  // Obtiene datos del usuario logueado
   const user = localStorage.getItem('EducaCenterUser');
   const userId = localStorage.getItem('EducaCenterId');
 
+  // Carga la lista de grupos al montar el componente
   useEffect(() => {
     setLoading(true);
     api.get('/groups.php')  
@@ -46,22 +54,26 @@ function GroupsAdmin({ onLogout }) {
       });
   }, []);
 
+  // Abre el diálogo para agregar un grupo
   const handleAddGroup = () => {
     setSelectedGroup(null);
     setAddGroupDialogOpen(true);
   };
 
+  // Abre el diálogo para editar un grupo existente
   const handleEditGroup = (group) => {
     setSelectedGroup(group);
     setEditGroupDialogOpen(true);
   };
 
+  // Abre el diálogo para eliminar un grupo existente
   const handleDeleteGroup = (groupId) => {
     const groupToDelete = groups.find(g => g.id === groupId);
     setSelectedGroup(groupToDelete);
     setDeleteGroupDialogOpen(true);
   };
 
+  // Cabecera personalizada para la vista
   const header = (
     <Header
       userName={user || 'Usuario'}
@@ -72,6 +84,7 @@ function GroupsAdmin({ onLogout }) {
     />
   );
 
+  // Renderiza un esqueleto de carga para la tabla de grupos
   const renderLoadingSkeleton = () => (
     <Box p={2}>
       <Typography variant="h5" mb={2}>Gestión de Grupos</Typography>
@@ -99,10 +112,10 @@ function GroupsAdmin({ onLogout }) {
     </Box>
   );
 
-  // Función para recargar la lista de grupos tras una acción (agregar, editar, eliminar)
+  // Recarga la lista de grupos tras una acción (agregar, editar, eliminar)
   const reloadGroups = () => {
     setLoading(true);
-    api.get('/groups.php')  // Suponiendo que la API para grupos es /groups.php
+    api.get('/groups.php')  
       .then(res => {
         if (Array.isArray(res.data)) {
           setGroups(res.data);

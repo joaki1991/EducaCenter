@@ -5,11 +5,18 @@ import {
 } from '@mui/material';
 import api from '../api/axios';
 
+// Componente UpdateProfilePhoto: diálogo para actualizar la foto de perfil del usuario
+// Permite seleccionar, previsualizar y subir una imagen JPG
+// Maneja errores de validación y recarga la página tras el cambio
 const UpdateProfilePhoto = ({ open, onClose, userId, currentImageUrl }) => {
+    // Estado para el archivo seleccionado
     const [selectedFile, setSelectedFile] = useState(null);
+    // Estado para la vista previa de la imagen
     const [preview, setPreview] = useState(currentImageUrl);
+    // Estado para el mensaje de error
     const [error, setError] = useState(null); // Para manejar el mensaje de error
   
+    // Maneja el cambio de archivo seleccionado
     const handleFileChange = (e) => {
       const file = e.target.files[0];
       setSelectedFile(file);
@@ -28,6 +35,7 @@ const UpdateProfilePhoto = ({ open, onClose, userId, currentImageUrl }) => {
       }
     };
   
+    // Maneja la subida de la imagen seleccionada
     const handleUpload = async () => {
       if (!selectedFile || !userId) return;
   
@@ -46,21 +54,25 @@ const UpdateProfilePhoto = ({ open, onClose, userId, currentImageUrl }) => {
         // Recargar la página después de la subida exitosa
         window.location.reload(); // Recargar la página
       } catch (err) {
+        // Manejo de error al subir la imagen
         console.error(err);
         setError('Error al subir la imagen');
       }
     };
   
+    // Render principal del diálogo de actualización de foto
     return (
       <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Cambiar imagen de perfil</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+            {/* Vista previa de la imagen */}
             <Avatar
               src={preview}
               alt="Vista previa"
               sx={{ width: 100, height: 100 }}
             />
+            {/* Input para seleccionar archivo JPG */}
             <input type="file" accept="image/jpeg,image/jpg" onChange={handleFileChange} />
             <Typography variant="body2" color="textSecondary">
               Solo se aceptan archivos con formato .jpg

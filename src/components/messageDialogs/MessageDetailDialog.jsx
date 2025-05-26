@@ -14,9 +14,13 @@ const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 
+// Componente MessageDetailDialog: diálogo para visualizar el detalle de un mensaje
+// Muestra remitente, destinatario, asunto, fecha y contenido
+// Permite cerrar el diálogo
 function MessageDetailDialog({ open, onClose, message }) {
   return (
     <Dialog fullScreen open={open} onClose={onClose} TransitionComponent={Transition}>
+      {/* Barra superior con botón de cerrar y asunto del mensaje */}
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
@@ -27,6 +31,7 @@ function MessageDetailDialog({ open, onClose, message }) {
           </Typography>
         </Toolbar>
       </AppBar>
+      {/* Cuerpo del mensaje: remitente, destinatario, fecha y contenido */}
       <Box sx={{ padding: 3 }}>
         <Typography variant="h6">De: {message?.sender_name || message?.sender_id}</Typography>
         <Typography variant="h6">Para: {message?.receiver_name || message?.receiver_id}</Typography>

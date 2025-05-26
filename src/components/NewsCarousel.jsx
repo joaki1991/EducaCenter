@@ -1,3 +1,6 @@
+// Carrusel de noticias para la vista principal y noticias
+// Permite navegar entre noticias, ver contenido completo y muestra estado de carga
+// Carga las noticias desde la API al montar el componente
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, IconButton, CircularProgress, Button } from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';

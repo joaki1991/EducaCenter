@@ -12,19 +12,27 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente AddGroupDialog: diálogo para agregar un nuevo grupo
+// Permite ingresar el nombre del grupo, valida campos y muestra mensajes
+// Realiza la petición a la API para crear el grupo
 const AddGroupDialog = ({ open, onClose }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     name: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida el campo nombre antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre del grupo es obligatorio';
@@ -32,6 +40,7 @@ const AddGroupDialog = ({ open, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para crear el grupo
   const handleSubmit = () => {
     if (!validate()) return;
 
@@ -50,6 +59,7 @@ const AddGroupDialog = ({ open, onClose }) => {
         onClose(true); // Notifica al padre que debe recargar
       })
       .catch((err) => {
+        // Manejo de error al añadir grupo
         console.error('Error al añadir grupo:', err);
         setSnackbar({
           open: true,
@@ -59,6 +69,7 @@ const AddGroupDialog = ({ open, onClose }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ name: '' });
     setErrors({});

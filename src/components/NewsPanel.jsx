@@ -1,3 +1,6 @@
+// Panel para mostrar y gestionar la lista de noticias
+// Permite agregar, editar, eliminar y adjuntar archivos a noticias
+// Muestra una tabla con los datos y botones de acción
 import React from 'react';
 import {
   Box,
@@ -42,6 +45,7 @@ const NewsPanel = ({ news, onAdd, onEdit, onDelete, onAttach }) => {
                 <TableCell>{item.title}</TableCell>
                 <TableCell>{item.author || '-'}</TableCell>
                 <TableCell align="center">
+                  {/* Botón para editar noticia */}
                   <Button
                     variant="outlined"
                     color="primary"
@@ -52,6 +56,7 @@ const NewsPanel = ({ news, onAdd, onEdit, onDelete, onAttach }) => {
                   >
                     Editar
                   </Button>
+                  {/* Botón para eliminar noticia */}
                   <Button
                     variant="outlined"
                     color="error"
@@ -62,6 +67,7 @@ const NewsPanel = ({ news, onAdd, onEdit, onDelete, onAttach }) => {
                   >
                     Eliminar
                   </Button>
+                  {/* Botón para adjuntar foto a la noticia */}
                   <Button
                     variant="outlined"
                     color="secondary"

@@ -12,24 +12,32 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente AddNewDialog: diálogo para agregar una nueva noticia
+// Permite ingresar título y contenido, valida campos y muestra mensajes
+// Realiza la petición a la API para crear la noticia
 const AddNewDialog = ({ open, onClose }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     title: '',
     content: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'El título es obligatorio';
@@ -38,6 +46,7 @@ const AddNewDialog = ({ open, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para crear la noticia
   const handleSubmit = () => {
     if (!validate()) return;
 
@@ -60,6 +69,7 @@ const AddNewDialog = ({ open, onClose }) => {
         onClose(true); // Indica que se debe actualizar la lista
       })
       .catch((err) => {
+        // Manejo de error al añadir anuncio
         console.error('Error al añadir anuncio:', err);
         setSnackbar({
           open: true,
@@ -69,6 +79,7 @@ const AddNewDialog = ({ open, onClose }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ title: '', content: '' });
     setErrors({});

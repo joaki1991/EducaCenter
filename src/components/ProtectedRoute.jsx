@@ -1,3 +1,5 @@
+// Componente para proteger rutas privadas de la aplicación
+// Redirige al login si el usuario no está autenticado
 import { Navigate } from 'react-router-dom';
 import { isAuthenticated } from "../api/auth";
 

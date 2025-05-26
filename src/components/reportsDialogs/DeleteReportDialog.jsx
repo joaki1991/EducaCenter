@@ -1,3 +1,6 @@
+// Diálogo para confirmar y eliminar un informe académico
+// Muestra mensaje de confirmación y feedback de éxito o error
+// Realiza la petición a la API para eliminar el informe
 import React from 'react';
 import {
   Dialog,
@@ -12,12 +15,14 @@ import {
 import api from '../../api/axios';
 
 const DeleteReportDialog = ({ open, onClose, report }) => {
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Maneja la eliminación del informe llamando a la API
   const handleDelete = () => {
     api.delete('/reports.php', {
       data: { id: report.id }
@@ -31,6 +36,7 @@ const DeleteReportDialog = ({ open, onClose, report }) => {
       onClose(true); // Indica que debe recargarse la lista
     })
     .catch(err => {
+      // Manejo de error al eliminar el informe
       console.error('Error al eliminar el informe:', err);
       setSnackbar({
         open: true,

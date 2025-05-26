@@ -13,6 +13,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 
+// Componente de layout con panel lateral de navegación
+// Permite abrir/cerrar el menú lateral y navegar entre vistas principales
+// Muestra botones según el rol del usuario
 const SidePanelLayout = ({ children, header }) => {
   const [open, setOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);

@@ -11,13 +11,18 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente DeleteGroupDialog: diálogo para confirmar y eliminar un grupo
+// Muestra mensaje de confirmación y feedback de éxito o error
+// Realiza la petición a la API para eliminar el grupo
 const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Maneja la eliminación del grupo llamando a la API
   const handleDelete = () => {
       api.delete('/groups.php', {
         data: { id: group.id }
@@ -34,6 +39,7 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
         onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
+        // Manejo de error al eliminar el grupo
         console.error('Error al eliminar el grupo:', err);
         setSnackbar({
           open: true,
@@ -43,6 +49,7 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
       });
   };
 
+  // Render principal del diálogo de confirmación de eliminación
   return (
     <>
       <Dialog open={open} onClose={() => onClose(false)}>
@@ -68,6 +75,7 @@ const DeleteGroupDialog = ({ open, onClose, group, onGroupDeleted }) => {
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar para mostrar mensajes de éxito o error */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

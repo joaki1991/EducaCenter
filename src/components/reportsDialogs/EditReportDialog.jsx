@@ -1,3 +1,6 @@
+// Diálogo para editar un informe académico existente
+// Permite modificar el estudiante y el contenido del informe
+// Realiza la petición a la API para actualizar el informe y muestra feedback
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -18,15 +21,20 @@ import {
 import api from '../../api/axios';
 
 const EditReportDialog = ({ open, onClose, report }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     student_id: '',
     content: ''
   });
 
+  // Estado para la lista de estudiantes
   const [students, setStudents] = useState([]);
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Efecto para actualizar el formulario y cargar estudiantes cuando cambia el informe a editar
   useEffect(() => {
     if (report) {
       setFormData({
@@ -43,6 +51,7 @@ const EditReportDialog = ({ open, onClose, report }) => {
         setStudents(res.data || []);
       })
       .catch((err) => {
+        // Manejo de error al obtener estudiantes
         console.error('Error al obtener estudiantes:', err);
         setSnackbar({
           open: true,
@@ -52,11 +61,13 @@ const EditReportDialog = ({ open, onClose, report }) => {
       });
   }, [report]);
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.student_id) newErrors.student_id = 'Debe seleccionar un estudiante';
@@ -65,6 +76,7 @@ const EditReportDialog = ({ open, onClose, report }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para actualizar el informe
   const handleSubmit = () => {
     if (!validate()) return;
 
@@ -86,6 +98,7 @@ const EditReportDialog = ({ open, onClose, report }) => {
         setErrors({});
       })
       .catch(err => {
+        // Manejo de error al editar el informe
         console.error('Error al editar el informe:', err);
         setSnackbar({
           open: true,
@@ -95,6 +108,7 @@ const EditReportDialog = ({ open, onClose, report }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ student_id: '', content: '' });
     setErrors({});

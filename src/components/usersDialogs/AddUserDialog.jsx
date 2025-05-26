@@ -16,7 +16,11 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente AddUserDialog: diálogo para agregar un nuevo usuario
+// Permite ingresar datos básicos y rol, valida campos y muestra mensajes
+// Realiza la petición a la API para crear el usuario
 const AddUserDialog = ({ open, onClose }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     name: '',
     surname: '',
@@ -25,14 +29,18 @@ const AddUserDialog = ({ open, onClose }) => {
     password: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
@@ -42,6 +50,7 @@ const AddUserDialog = ({ open, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para crear el usuario
   const handleSubmit = () => {
     if (!validate()) return;
   
@@ -65,6 +74,7 @@ const AddUserDialog = ({ open, onClose }) => {
         onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
+        // Manejo de error al añadir usuario
         console.error('Error al añadir usuario:', err);
         setSnackbar({
           open: true,
@@ -74,6 +84,7 @@ const AddUserDialog = ({ open, onClose }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ name: '', surname: '', email: '', role: '', password: '' });
     setErrors({});
