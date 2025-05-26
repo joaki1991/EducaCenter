@@ -82,6 +82,7 @@ function Messages({ onLogout }) {
       }
     }
     setSelectedMessage(null);
+    window.location.reload(); // Recargar la página para reflejar cambios
   };
 
   // Filtra los mensajes según la pestaña activa
