@@ -38,7 +38,7 @@ function News({ onLogout }) {
   );
 
   const fetchNews = () => {
-    setLoading(true);
+    setLoading(true); // Inicia el loading
     fetch(`${API_BASE}/announcements.php`, {
       headers: {
         Authorization: localStorage.getItem('EducaCenterToken'),
@@ -47,11 +47,11 @@ function News({ onLogout }) {
       .then((res) => res.json())
       .then((data) => {
         setNews(data);
-        setLoading(false);
+        setLoading(false); // Termina el loading
       })
       .catch((err) => {
         console.error(err);
-        setLoading(false);
+        setLoading(false); // Termina el loading en caso de error
       });
   };
 
@@ -97,20 +97,19 @@ function News({ onLogout }) {
         </SidePanelLayout>
       ) : (
         <SidePanelLayout header={header}>
-          {!loading && (
-            <NewsPanel
-              news={news}
-              onAdd={handleAdd}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onAttach={handleAttach}
-            />
-          )}
+          {/* Pasamos el estado loading a NewsPanel */}
+          <NewsPanel
+            news={news}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onAttach={handleAttach}
+            loading={loading} // Pasamos el estado de carga
+          />
         </SidePanelLayout>
       )}
 
       {/* Configuración y foto */}
-
       <UpdateProfilePhoto
         open={photoDialogOpen}
         onClose={() => setPhotoDialogOpen(false)}
