@@ -1,3 +1,6 @@
+// Panel para mostrar y gestionar la lista de faltas de asistencia
+// Permite agregar, editar y eliminar faltas según el rol
+// Muestra una tabla con los datos, estados de carga y botones de acción
 import React from 'react';
 import {
   Box,
@@ -23,13 +26,16 @@ const AbsencesPanel = ({
   onEdit,
   onDelete
 }) => {
+  // Obtiene el rol del usuario desde localStorage para controlar permisos de edición
   const userRole = localStorage.getItem('EducaCenterRole');
 
-  // Número de filas skeleton a mostrar
+  // Número de filas skeleton a mostrar durante la carga
   const skeletonRows = 5;
 
+  // Render principal del panel de faltas de asistencia
   return (
     <Box p={2}>
+      {/* Encabezado y botón para añadir falta si el usuario es profesor */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Faltas de Asistencia</Typography>
         {isEditable && userRole === "teacher" && (
@@ -43,7 +49,9 @@ const AbsencesPanel = ({
         )}
       </Box>
 
+      {/* Tabla de carga (skeleton), error, vacío o datos reales */}
       {loading ? (
+        // Muestra tabla skeleton mientras se cargan los datos
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -83,10 +91,13 @@ const AbsencesPanel = ({
           </Table>
         </TableContainer>
       ) : error ? (
+        // Muestra mensaje de error si ocurre un error
         <Typography color="error">{error}</Typography>
       ) : absences.length === 0 ? (
+        // Muestra mensaje si no hay faltas registradas
         <Typography>No hay faltas de asistencia registradas.</Typography>
       ) : (
+        // Muestra la tabla de faltas con acciones si hay datos
         <TableContainer component={Paper}>
           <Table>
             <TableHead>

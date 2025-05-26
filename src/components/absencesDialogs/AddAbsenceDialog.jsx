@@ -1,3 +1,7 @@
+// Diálogo para agregar una nueva falta de asistencia
+// Permite seleccionar estudiante, fecha y justificación, valida campos y muestra mensajes
+// Realiza la petición a la API para crear la falta
+
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -17,23 +21,32 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente AddAbsenceDialog: diálogo para agregar una nueva falta de asistencia
+// Permite seleccionar estudiante, fecha y justificación, valida campos y muestra mensajes
+// Realiza la petición a la API para crear la falta
 const AddAbsenceDialog = ({ open, onClose }) => {
+  // Estado para la lista de estudiantes
   const [students, setStudents] = useState([]);
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     student_id: '',
     date: '',
     justified: ''  // nuevo campo justified
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Estado para el id del profesor
   const [teacherId, setTeacherId] = useState(null);
 
+  // Efecto para cargar estudiantes y obtener el id del profesor al abrir el diálogo
   useEffect(() => {
     if (open) {
       api.get('/students.php')
@@ -69,11 +82,13 @@ const AddAbsenceDialog = ({ open, onClose }) => {
     }
   }, [open]);
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos del formulario antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.student_id) newErrors.student_id = 'Seleccione un estudiante';
@@ -83,6 +98,7 @@ const AddAbsenceDialog = ({ open, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para crear la falta
   const handleSubmit = () => {
     if (!validate()) return;
     if (!teacherId) {
@@ -121,6 +137,7 @@ const AddAbsenceDialog = ({ open, onClose }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ student_id: '', date: '', justified: '' });
     setErrors({});

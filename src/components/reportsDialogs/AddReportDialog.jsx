@@ -1,3 +1,6 @@
+// Componente AddReportDialog: diálogo para agregar un nuevo informe académico
+// Permite seleccionar estudiante y escribir el contenido del informe
+// Realiza la petición a la API para crear el informe y muestra feedback
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -18,21 +21,27 @@ import {
 import api from '../../api/axios';
 
 const AddReportDialog = ({ open, onClose }) => {
+  // Estado para la lista de estudiantes
   const [students, setStudents] = useState([]);
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     student_id: '',
     content: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Estado para el id del profesor
   const [teacherId, setTeacherId] = useState(null);
 
+  // Efecto para cargar estudiantes y obtener el id del profesor al abrir el diálogo
   useEffect(() => {
     if (open) {
       // Obtener estudiantes
@@ -73,11 +82,13 @@ const AddReportDialog = ({ open, onClose }) => {
     }
   }, [open]);
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos del formulario antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.student_id) newErrors.student_id = 'Seleccione un estudiante';
@@ -86,6 +97,7 @@ const AddReportDialog = ({ open, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para crear el informe
   const handleSubmit = () => {
     if (!validate()) return;
     if (!teacherId) {
@@ -115,6 +127,7 @@ const AddReportDialog = ({ open, onClose }) => {
         onClose(true);
       })
       .catch((err) => {
+        // Manejo de error al añadir informe
         console.error('Error al añadir informe:', err);
         setSnackbar({
           open: true,
@@ -124,6 +137,7 @@ const AddReportDialog = ({ open, onClose }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ student_id: '', content: '' });
     setErrors({});

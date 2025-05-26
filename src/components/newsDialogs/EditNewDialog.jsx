@@ -12,15 +12,22 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente EditNewDialog: diálogo para editar una noticia existente
+// Permite modificar título y contenido, valida campos y muestra mensajes
+// Realiza la petición a la API para actualizar la noticia
 const EditNewDialog = ({ open, onClose, announcement }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     title: '',
     content: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Efecto para actualizar el formulario cuando cambia el anuncio a editar
   useEffect(() => {
     if (announcement) {
       setFormData({
@@ -33,11 +40,13 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
     }
   }, [announcement]);
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'El título es obligatorio';
@@ -46,6 +55,7 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para actualizar la noticia
   const handleSubmit = () => {
     if (!validate()) return;
 
@@ -62,14 +72,13 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
           message: 'Anuncio editado correctamente',
           severity: 'success'
         });
-
-         // Aquí indicamos que hubo actualización
+        // Aquí indicamos que hubo actualización
         onClose(true);
-
         setFormData({ title: '', content: '' });
         setErrors({});
       })
       .catch(err => {
+        // Manejo de error al editar el anuncio
         console.error('Error al editar el anuncio:', err);
         setSnackbar({
           open: true,
@@ -79,6 +88,7 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ title: '', content: '' });
     setErrors({});

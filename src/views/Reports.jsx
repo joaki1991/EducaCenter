@@ -1,3 +1,5 @@
+// Vista de informes académicos: muestra, agrega, edita y elimina informes según el rol
+// Importaciones principales de React, componentes propios y utilidades
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Box } from '@mui/material';
@@ -14,6 +16,7 @@ import ViewReportDialog from '../components/reportsDialogs/ViewReportDialog';
 import api from '../api/axios';
 
 function Reports({ onLogout }) {
+  // Estados para controlar la apertura de los diferentes diálogos
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -21,15 +24,19 @@ function Reports({ onLogout }) {
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
+  // Estados para la gestión de los informes y la carga de datos
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Obtención de datos del usuario desde localStorage
   const user = localStorage.getItem('EducaCenterUser');
   const userId = localStorage.getItem('EducaCenterId');
   const role = localStorage.getItem('EducaCenterRole');
+  // Determina si el usuario puede editar (solo admin o teacher)
   const isEditable = role === 'admin' || role === 'teacher';
 
+  // Componente de cabecera personalizado
   const header = (
     <Header
       userName={user || 'Usuario'}
@@ -40,6 +47,7 @@ function Reports({ onLogout }) {
     />
   );
 
+// Función para obtener los informes según el rol del usuario
 const fetchReports = React.useCallback(async () => {
   setLoading(true);
   try {
@@ -48,6 +56,7 @@ const fetchReports = React.useCallback(async () => {
     if (role === 'admin') {
       response = await api.get('/reports.php');
     } else if (role === 'teacher') {
+      // Si es profesor, busca su id y luego los informes asociados
       const res = await api.get(`/teachers.php?user_id=${userId}`);
       const teacher = res.data[0];
       if (teacher) {
@@ -57,6 +66,7 @@ const fetchReports = React.useCallback(async () => {
         return;
       }
     } else if (role === 'student') {
+      // Si es estudiante, busca su id y luego sus informes
       const res = await api.get(`/students.php?user_id=${userId}`);
       const student = res.data[0];
       if (student) {
@@ -66,6 +76,7 @@ const fetchReports = React.useCallback(async () => {
         return;
       }
     } else if (role === 'parent') {
+      // Si es padre, busca sus hijos y los informes de cada uno
       const res = await api.get(`/parents.php?user_id=${userId}`);
       const parent = res.data[0];
       if (!parent) {
@@ -80,6 +91,7 @@ const fetchReports = React.useCallback(async () => {
         return;
       }
 
+      // Obtiene los informes de todos los hijos en paralelo
       const promises = children.map(child =>
         api.get(`/reports.php?student_id=${child.id}`).then(res =>
           res.data.map(report => ({ ...report, student_name: child.name }))
@@ -101,6 +113,7 @@ const fetchReports = React.useCallback(async () => {
   }
 }, [role, userId]);
 
+  // Efecto para cargar los informes al montar el componente o cambiar el rol/usuario
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
@@ -115,6 +128,7 @@ const fetchReports = React.useCallback(async () => {
         backgroundPosition: 'center',
       }}
     >
+      {/* Layout principal con panel lateral y cabecera */}
       <SidePanelLayout header={header}>
         <ReportsPanel
           reports={reports}
@@ -137,7 +151,7 @@ const fetchReports = React.useCallback(async () => {
         />
       </SidePanelLayout>
 
-      {/* Dialogos de gestión */}
+      {/* Diálogos para agregar, editar, eliminar y ver informes */}
       <AddReportDialog
         open={addOpen}
         onClose={(updated) => {
@@ -167,6 +181,7 @@ const fetchReports = React.useCallback(async () => {
         onClose={() => setViewOpen(false)}
       />
 
+      {/* Diálogo para actualizar la foto de perfil */}
       <UpdateProfilePhoto
         open={photoDialogOpen}
         onClose={() => setPhotoDialogOpen(false)}

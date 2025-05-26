@@ -11,13 +11,18 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente DeleteUserDialog: diálogo para confirmar y eliminar un usuario
+// Muestra mensaje de confirmación y feedback de éxito o error
+// Realiza la petición a la API para eliminar el usuario
 const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Maneja la eliminación del usuario llamando a la API
   const handleDelete = () => {
       api.delete('/users.php', {
         data: { id: user.id }
@@ -34,6 +39,7 @@ const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
         onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
+        // Manejo de error al eliminar el usuario
         console.error('Error al eliminar el usuario:', err);
         setSnackbar({
           open: true,

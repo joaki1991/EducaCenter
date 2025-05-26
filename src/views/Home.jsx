@@ -8,6 +8,8 @@ import fondo from '../assets/fondo.png';
 import API_BASE from '../api/config';
 import UpdateProfilePhoto from '../components/UpdateProfilePhoto';
 
+// Vista principal de inicio
+// Muestra el carrusel de noticias y acceso a la actualización de foto de perfil
 function Home({ onLogout }) {
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
 

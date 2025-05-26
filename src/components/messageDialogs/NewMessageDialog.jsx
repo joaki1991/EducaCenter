@@ -13,12 +13,17 @@ import {
 } from '@mui/material';
 import api from '../../api/axios'; 
 
+// Componente NewMessageDialog: diálogo para crear y enviar un nuevo mensaje
+// Permite seleccionar destinatario, asunto y contenido, valida campos y muestra mensajes
+// Realiza la petición a la API para enviar el mensaje
 function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
+  // Estados para los campos del formulario y la lista de usuarios
   const [recipientId, setRecipientId] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [users, setUsers] = useState([]);
 
+  // Efecto para cargar la lista de usuarios al abrir el diálogo
   useEffect(() => {
     if (open) {
       api.get('/users.php')
@@ -27,6 +32,7 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
     }
   }, [open]);
 
+  // Maneja el envío del mensaje
   const handleSend = async () => {
     try {
       const response = await api.post('/messages.php', {
@@ -39,11 +45,13 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
       onMessageSent(response.data); // Pasas el mensaje recién creado
       handleClose();
     } catch (error) {
+      // Manejo de error al enviar el mensaje
       console.error(error);
       alert('No se pudo enviar el mensaje.');
     }
   };
 
+  // Limpia los campos y cierra el diálogo
   const handleClose = () => {
     setRecipientId('');
     setSubject('');

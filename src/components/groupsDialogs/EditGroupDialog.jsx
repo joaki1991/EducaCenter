@@ -12,14 +12,21 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente EditGroupDialog: diálogo para editar un grupo existente
+// Permite modificar el nombre del grupo, valida campos y muestra mensajes
+// Realiza la petición a la API para actualizar el grupo
 const EditGroupDialog = ({ open, onClose, group }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     name: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Efecto para actualizar el formulario cuando cambia el grupo a editar
   useEffect(() => {
     if (group) {
       // Si se pasa un grupo, actualizar el formulario con los datos del grupo
@@ -29,11 +36,13 @@ const EditGroupDialog = ({ open, onClose, group }) => {
     }
   }, [group]);
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida el campo nombre antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre del grupo es obligatorio';
@@ -41,6 +50,7 @@ const EditGroupDialog = ({ open, onClose, group }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para actualizar el grupo
   const handleSubmit = () => {
     if (!validate()) return;
 
@@ -60,6 +70,7 @@ const EditGroupDialog = ({ open, onClose, group }) => {
         onClose(true); // Notifica al padre que debe recargar
       })
       .catch((err) => {
+        // Manejo de error al editar grupo
         console.error('Error al editar grupo:', err);
         setSnackbar({
           open: true,
@@ -69,6 +80,7 @@ const EditGroupDialog = ({ open, onClose, group }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ name: '' });
     setErrors({});

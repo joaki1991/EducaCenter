@@ -14,6 +14,9 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 
+// Panel principal para mostrar la lista de informes académicos
+// Muestra tabla con informes, botones de acción y estados de carga/error
+// Los botones y acciones varían según el rol del usuario
 const ReportsPanel = ({
   reports,
   loading,
@@ -111,6 +114,7 @@ const ReportsPanel = ({
                       ? new Date(report.created_at).toLocaleDateString()
                       : 'Fecha no válida'}
                   </TableCell>
+                  {/* Botón para visualizar informe si la prop onView está presente */}
                   {onView && (
                     <TableCell align="center">
                       <Button
@@ -124,6 +128,7 @@ const ReportsPanel = ({
                       </Button>
                     </TableCell>
                   )}
+                  {/* Botones de acción para editar y eliminar informe si es editable */}
                   {isEditable && (
                     <TableCell align="center">
                       <Button

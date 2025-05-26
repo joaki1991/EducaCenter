@@ -1,3 +1,6 @@
+// Lista de mensajes para la vista de mensajes
+// Muestra cada mensaje con asunto, remitente y estado de leído/no leído
+// Permite seleccionar un mensaje para ver su detalle
 import React from 'react';
 import {
   List,
@@ -10,14 +13,19 @@ import {
 } from '@mui/material';
 import MailIcon from '@mui/icons-material/MailOutline';
 
+// Componente MessageList: muestra la lista de mensajes y permite seleccionar uno para ver su detalle
+// Resalta los mensajes no leídos y muestra asunto, remitente y fecha
 function MessageList({ messages, onMessageClick }) {
   return (
     <List>
+      {/* Itera sobre los mensajes y renderiza cada uno */}
       {messages.map((msg, index) => {
+        // Determina si el mensaje está leído o no
         const isRead = msg.is_read === 1 || msg.is_read === true;
 
         return (
           <React.Fragment key={msg.id || index}>
+            {/* Item de mensaje con fondo diferente si no está leído */}
             <ListItem
               alignItems="flex-start"
               sx={{
@@ -26,11 +34,13 @@ function MessageList({ messages, onMessageClick }) {
               }}
               onClick={() => onMessageClick(msg)}
             >
+              {/* Icono de mensaje */}
               <ListItemAvatar>
                 <Avatar>
                   <MailIcon />
                 </Avatar>
               </ListItemAvatar>
+              {/* Asunto y resumen del mensaje */}
               <ListItemText
                 primary={
                   <Typography
@@ -43,6 +53,7 @@ function MessageList({ messages, onMessageClick }) {
                 }
                 secondary={
                   <>
+                    {/* Cuerpo del mensaje (resumido) */}
                     <Typography
                       variant="body2"
                       color="textSecondary"
@@ -52,6 +63,7 @@ function MessageList({ messages, onMessageClick }) {
                     >
                       {msg.body?.slice(0, 100) || 'Sin contenido'}...
                     </Typography>
+                    {/* Remitente y fecha */}
                     <Typography
                       variant="caption"
                       color="textSecondary"
@@ -64,6 +76,7 @@ function MessageList({ messages, onMessageClick }) {
                 }
               />
             </ListItem>
+            {/* Separador entre mensajes */}
             <Divider component="li" />
           </React.Fragment>
         );

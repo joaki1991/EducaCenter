@@ -11,13 +11,18 @@ import {
 } from '@mui/material';
 import api from '../../api/axios';
 
+// Componente DeleteAbsenceDialog: diálogo para confirmar y eliminar una falta de asistencia
+// Muestra mensaje de confirmación y feedback de éxito o error
+// Realiza la petición a la API para eliminar la falta
 const DeleteAbsenceDialog = ({ open, onClose, absence }) => {
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: '',
     severity: 'success'
   });
 
+  // Maneja la eliminación de la falta llamando a la API
   const handleDelete = () => {
     api.delete('/absences.php', {
       data: { id: absence.id }
@@ -31,6 +36,7 @@ const DeleteAbsenceDialog = ({ open, onClose, absence }) => {
         onClose(true);
       })
       .catch(err => {
+        // Manejo de error al eliminar la falta
         console.error('Error al eliminar la falta:', err);
         setSnackbar({
           open: true,
@@ -40,6 +46,7 @@ const DeleteAbsenceDialog = ({ open, onClose, absence }) => {
       });
   };
 
+  // Render principal del diálogo de confirmación de eliminación
   return (
     <>
       <Dialog open={open} onClose={() => onClose(false)}>
@@ -70,6 +77,7 @@ const DeleteAbsenceDialog = ({ open, onClose, absence }) => {
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar para mostrar mensajes de éxito o error */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

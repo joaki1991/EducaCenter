@@ -1,3 +1,7 @@
+// Vista de administración de usuarios
+// Permite ver, agregar, editar, eliminar y vincular usuarios
+// Incluye panel de usuarios y diálogos de gestión
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Skeleton } from '@mui/material';
@@ -28,18 +32,22 @@ function UsersAdmin({ onLogout }) {
   const user = localStorage.getItem('EducaCenterUser');
   const userId = localStorage.getItem('EducaCenterId');
 
+  // Efecto para cargar la lista de usuarios al montar el componente
   useEffect(() => {
     setLoading(true);
     api.get('/users.php')
       .then(res => {
+        // Si la respuesta es un array, se setean los usuarios
         if (Array.isArray(res.data)) {
           setUsers(res.data);
         } else {
+          // Si la respuesta no es la esperada, se setea lista vacía
           console.warn('Respuesta inesperada:', res.data);
           setUsers([]);
         }
       })
       .catch(err => {
+        // Manejo de error al cargar usuarios
         console.error('Error al cargar usuarios:', err);
         setUsers([]);
       })
@@ -48,27 +56,32 @@ function UsersAdmin({ onLogout }) {
       });
   }, []);
 
+  // Handler para abrir el diálogo de agregar usuario
   const handleAddUser = () => {
     setSelectedUser(null);
     setAddDialogOpen(true);
   };
 
+  // Handler para abrir el diálogo de edición de usuario
   const handleEditUser = (user) => {
     setSelectedUser(user);
     setEditDialogOpen(true);
   };
 
+  // Handler para abrir el diálogo de eliminación de usuario
   const handleDeleteUser = (userId) => {
     const userToDelete = users.find(u => u.id === userId);
     setSelectedUser(userToDelete);
     setDeleteDialogOpen(true);
   };
 
+  // Handler para abrir el diálogo de vinculación de usuario
   const handleLinkUser = (user) => {
     setSelectedUser(user);
     setLinkDialogOpen(true);
   };
 
+  // Header personalizado con datos del usuario logueado
   const header = (
     <Header
       userName={user || 'Usuario'}
@@ -79,6 +92,7 @@ function UsersAdmin({ onLogout }) {
     />
   );
 
+  // Renderiza un esqueleto de carga mientras se obtienen los usuarios
   const renderLoadingSkeleton = () => (
     <Box p={2}>
       <Typography variant="h5" mb={2}>Gestión de Usuarios</Typography>

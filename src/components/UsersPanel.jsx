@@ -1,3 +1,6 @@
+// Panel para mostrar y gestionar la lista de usuarios
+// Permite agregar, editar, eliminar y vincular usuarios
+// Muestra una tabla con los datos y botones de acción
 import React from 'react';
 import {
   Box,
@@ -13,9 +16,12 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Link as LinkIcon } from '@mui/icons-material';
 
+// Componente UsersPanel: muestra y gestiona la lista de usuarios
+// Permite agregar, editar, eliminar y vincular usuarios mediante botones de acción
 const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
   return (
     <Box p={2}>
+      {/* Encabezado y botón para añadir usuario */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5">Gestión de Usuarios</Typography>
         <Button
@@ -28,6 +34,7 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
         </Button>
       </Box>
 
+      {/* Tabla de usuarios con acciones */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -41,6 +48,7 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
             </TableRow>
           </TableHead>
           <TableBody>
+            {/* Renderiza cada usuario y sus botones de acción */}
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
@@ -49,6 +57,7 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.group_name || '-'}</TableCell>
                 <TableCell align="center">
+                  {/* Botón para editar usuario */}
                   <Button
                     type="button"
                     variant="outlined"
@@ -60,6 +69,7 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
                   >
                     Editar
                   </Button>
+                  {/* Botón para eliminar usuario */}
                   <Button
                     type="button"
                     variant="outlined"
@@ -71,7 +81,7 @@ const UsersPanel = ({ users, onAdd, onEdit, onDelete, onLink }) => {
                   >
                     Eliminar
                   </Button>
-                  {/* Solo mostrar el botón "Vincular" si el rol no es "admin" o "parent" */}
+                  {/* Botón para vincular usuario (solo si no es admin ni parent) */}
                   {user.role !== 'admin' && user.role !== 'parent' && (
                     <Button
                       type="button"

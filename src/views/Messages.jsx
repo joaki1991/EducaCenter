@@ -1,3 +1,7 @@
+// Vista de mensajes
+// Permite ver mensajes recibidos/enviados, crear nuevos y ver detalles
+// Incluye tabs, panel de mensajes y diálogos de gestión
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -19,15 +23,22 @@ import NewMessageDialog from '../components/messageDialogs/NewMessageDialog';
 import MessageDetailDialog from '../components/messageDialogs/MessageDetailDialog';
 
 function Messages({ onLogout }) {
+  // Controla la apertura del diálogo de foto de perfil
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  // Controla la pestaña activa (0: entrada, 1: salida)
   const [tab, setTab] = useState(0);
+  // Lista de mensajes
   const [messages, setMessages] = useState([]);
+  // Controla la apertura del diálogo para nuevo mensaje
   const [newMessageOpen, setNewMessageOpen] = useState(false);
+  // Mensaje seleccionado para ver detalle
   const [selectedMessage, setSelectedMessage] = useState(null);
 
+  // Obtiene datos del usuario logueado
   const user = localStorage.getItem('EducaCenterUser');
   const userId = Number(localStorage.getItem('EducaCenterId'));
 
+  // Cabecera personalizada
   const header = (
     <Header
       userName={user || 'Usuario'}
@@ -38,7 +49,7 @@ function Messages({ onLogout }) {
     />
   );
 
-  // Creamos la función para recargar mensajes
+  // Obtiene los mensajes desde la API
   const fetchMessages = async () => {
     try {
       const response = await api.get('/messages.php');
@@ -48,19 +59,19 @@ function Messages({ onLogout }) {
     }
   };
 
+  // Carga los mensajes al montar el componente
   useEffect(() => {
     fetchMessages();
   }, []);
 
+  // Maneja el cierre del diálogo de detalle de mensaje y marca como leído si corresponde
   const handleCloseMessageDialog = async () => {
     if (selectedMessage && selectedMessage.is_read !== 1 && selectedMessage.receiver_id === userId) {
-      // Si el mensaje no está leído y es para el usuario, lo marcamos como leído
       try {
         await api.put('/messages.php', {
           id: selectedMessage.id,
           is_read: 1,
         });
-
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === selectedMessage.id ? { ...msg, is_read: 1 } : msg
@@ -70,11 +81,11 @@ function Messages({ onLogout }) {
         console.error('Error al actualizar is_read:', error);
       }
     }
-
     setSelectedMessage(null);
     window.location.reload(); // Recargar la página para reflejar cambios
   };
 
+  // Filtra los mensajes según la pestaña activa
   const filteredMessages = messages.filter((msg) =>
     tab === 0
       ? msg.receiver_id === userId // Entrada

@@ -1,3 +1,6 @@
+// Diálogo para cambiar la contraseña del usuario
+// Permite ingresar la contraseña actual y la nueva, mostrando mensajes de error o éxito
+// Realiza la petición a la API para actualizar la contraseña
 import React, { useState } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
@@ -6,7 +9,11 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import api from '../api/axios'; 
 
+// Componente NewPasswordDialog: diálogo para cambiar la contraseña del usuario
+// Permite ingresar la contraseña actual y la nueva, mostrando mensajes de error o éxito
+// Realiza la petición a la API para actualizar la contraseña
 const NewPasswordDialog = ({ open, onClose, userId }) => {
+  // Estados locales para los campos y visibilidad de contraseñas
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showCurrent, setShowCurrent] = useState(false);
@@ -15,9 +22,11 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Maneja el guardado de la nueva contraseña
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Llama a la API para actualizar la contraseña
       const response = await api.post('/updatePassword.php', {
         id: userId,
         old_password: currentPassword,
@@ -25,6 +34,7 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
       });
 
       if (response.data.success) {
+        // Si es exitoso, muestra mensaje y limpia campos
         setSuccessMessage('Contraseña actualizada correctamente');
         setErrorMessage('');
         setCurrentPassword('');
@@ -32,12 +42,14 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
         setTimeout(() => {
           setSuccessMessage('');
           handleClose();
-        }, 1500); // Dejo 1,5 segundos para que el usuario vea el mensaje de éxito
+        }, 1500); // Deja 1,5 segundos para mostrar el mensaje de éxito
       } else {
+        // Si hay error, muestra mensaje de error
         setErrorMessage(response.data.error || 'Error al actualizar la contraseña');
         setSuccessMessage('');
       }
     } catch (error) {
+      // Manejo de error de red o servidor
       setErrorMessage(
         error.response?.data?.error || 'No se pudo conectar con el servidor'
       );
@@ -47,6 +59,7 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
     }
   };
 
+  // Limpia los campos y cierra el diálogo
   const handleClose = () => {
     setCurrentPassword('');
     setNewPassword('');
@@ -56,9 +69,12 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
     onClose();
   };
 
+  // Alterna la visibilidad de la contraseña actual
   const toggleShowCurrent = () => setShowCurrent((prev) => !prev);
+  // Alterna la visibilidad de la nueva contraseña
   const toggleShowNew = () => setShowNew((prev) => !prev);
 
+  // Render principal del diálogo de cambio de contraseña
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Actualizar Contraseña</DialogTitle>
@@ -67,6 +83,7 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
           <Typography variant="body2">
             Introduce tu contraseña actual y la nueva
           </Typography>
+          {/* Campo para la contraseña actual */}
           <TextField
             type={showCurrent ? 'text' : 'password'}
             label="Contraseña actual"
@@ -83,6 +100,7 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
               ),
             }}
           />
+          {/* Campo para la nueva contraseña */}
           <TextField
             type={showNew ? 'text' : 'password'}
             label="Nueva contraseña"
@@ -99,11 +117,13 @@ const NewPasswordDialog = ({ open, onClose, userId }) => {
               ),
             }}
           />
+          {/* Mensaje de error si existe */}
           {errorMessage && (
             <Typography color="error" variant="body2">
               {errorMessage}
             </Typography>
           )}
+          {/* Mensaje de éxito si existe */}
           {successMessage && (
             <Typography sx={{ color: 'green' }} variant="body2">
               {successMessage}

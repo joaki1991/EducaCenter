@@ -1,3 +1,6 @@
+// Componente EditUserDialog: diálogo para editar un usuario existente
+// Permite modificar datos básicos y rol, valida campos y muestra mensajes
+// Realiza la petición a la API para actualizar el usuario
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -17,6 +20,7 @@ import {
 import api from '../../api/axios';
 
 const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
     name: '',
     surname: '',
@@ -25,9 +29,12 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
     password: ''
   });
 
+  // Estado para errores de validación
   const [errors, setErrors] = useState({});
+  // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Efecto para actualizar el formulario cuando cambia el usuario a editar
   useEffect(() => {
     if (user && open) {
       // Si se pasa un usuario, actualizar el formulario con los datos del usuario
@@ -41,11 +48,13 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
     }
   }, [user, open]);
 
+  // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Valida los campos antes de enviar
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
@@ -55,6 +64,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Maneja el envío del formulario para actualizar el usuario
   const handleSubmit = () => {
     if (!validate()) return;
 
@@ -85,6 +95,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
         onClose(true); // Notifica al padre que debe recargar
       })
       .catch(err => {
+        // Manejo de error al editar el usuario
         console.error('Error al editar el usuario:', err);
         setSnackbar({
           open: true,
@@ -94,6 +105,7 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
       });
   };
 
+  // Maneja la cancelación y reseteo del formulario
   const handleCancel = () => {
     setFormData({ name: '', surname: '', email: '', role: '', password: '' });
     setErrors({});

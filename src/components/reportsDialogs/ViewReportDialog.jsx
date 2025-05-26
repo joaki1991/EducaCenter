@@ -1,3 +1,6 @@
+// Diálogo para visualizar el detalle de un informe académico
+// Muestra información del estudiante, profesor, fecha y contenido
+// Solo visualización, sin acciones de edición
 import React from 'react';
 import {
   Dialog,
@@ -17,6 +20,7 @@ const Transition = React.forwardRef((props, ref) => (
 const ViewReportDialog = ({ open, onClose, report }) => {
   return (
     <Dialog fullScreen open={open} onClose={onClose} TransitionComponent={Transition}>
+      {/* Barra superior con botón de cerrar y título */}
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
@@ -27,6 +31,7 @@ const ViewReportDialog = ({ open, onClose, report }) => {
           </Typography>
         </Toolbar>
       </AppBar>
+      {/* Cuerpo del informe: estudiante, profesor, fecha y contenido */}
       <Box sx={{ padding: 3 }}>
         <Typography variant="h6">
           Estudiante: {report?.student_name || report?.student_id}
