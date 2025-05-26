@@ -21,6 +21,7 @@ function User({ onLogout }) {
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [parentName, setParentName] = useState(null);
+  const [childrenName, setChildrenName] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const userId = localStorage.getItem('EducaCenterId');
@@ -37,6 +38,8 @@ function User({ onLogout }) {
           // Si el usuario es estudiante, buscar el nombre del padre
           if (user.role === 'student') {
             fetchParentData(user.id);
+          }else if (user.role === 'parent') {
+            fetchChildrenData(user.id);
           }
         } else {
           console.warn('Respuesta inesperada:', response.data);
@@ -50,14 +53,16 @@ function User({ onLogout }) {
 
     const fetchParentData = async (studentUserId) => {
       try {
-        const parentResponse = await api.get(`/parents.php?user_id=${studentUserId}`);
+        const studentResponse = await api.get(`/students.php?user_id=${studentUserId}`);
         if (
-          parentResponse.data &&
-          Array.isArray(parentResponse.data) &&
-          parentResponse.data.length > 0
+          studentResponse.data &&
+          Array.isArray(studentResponse.data) &&
+          studentResponse.data.length > 0
         ) {
-          const parentId = parentResponse.data[0].parent_id;
-          const parentUser = await api.get(`/users.php?id=${parentId}`);
+          const parentId = studentResponse.data[0].parent_id;
+          const parentData = await api.get(`/parents.php?id=${parentId}`);
+          const userId = parentData.data[0].user_id;
+          const parentUser = await api.get(`/users.php?id=${userId}`);
           if (
             parentUser.data &&
             Array.isArray(parentUser.data) &&
@@ -65,6 +70,31 @@ function User({ onLogout }) {
           ) {
             const parent = parentUser.data[0];
             setParentName(`${parent.name} ${parent.surname}`);
+          }
+        }
+      } catch (err) {
+        console.error('Error al cargar datos del padre:', err);
+      }
+    };
+
+    const fetchChildrenData = async (parentUserId) => {
+      try {
+        const parentResponse = await api.get(`/parents.php?user_id=${parentUserId}`);
+        if (
+          parentResponse.data &&
+          Array.isArray(parentResponse.data) &&
+          parentResponse.data.length > 0
+        ) {
+          const parentId = parentResponse.data[0].id;
+          const childrenData = await api.get(`/students.php?parent_id=${parentId}`);
+          if (
+            childrenData.data &&
+            Array.isArray(childrenData.data) &&
+            childrenData.data.length > 0
+          ) {
+            const childrenUser = await api.get(`/users.php?id=${childrenData.data[0].user_id}`);
+            const children = childrenUser.data[0]; 
+            setChildrenName(`${children.name} ${children.surname}`);
           }
         }
       } catch (err) {
@@ -158,6 +188,12 @@ function User({ onLogout }) {
             {parentName && (
               <Typography variant="body1" align="center">
                 {`Padre/Madre: ${parentName}`}
+              </Typography>
+            )}
+
+            {childrenName && (
+              <Typography variant="body1" align="center">
+                {`Hijo/Hija: ${childrenName}`}
               </Typography>
             )}
 
