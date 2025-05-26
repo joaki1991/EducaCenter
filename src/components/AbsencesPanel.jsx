@@ -10,7 +10,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
   Skeleton,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
