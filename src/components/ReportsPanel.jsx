@@ -10,7 +10,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
+  Skeleton,
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 
@@ -25,6 +25,8 @@ const ReportsPanel = ({
   onView
 }) => {
   const userRole = localStorage.getItem('EducaCenterRole');
+
+  const skeletonRows = 5;
 
   return (
     <Box p={2}>
@@ -43,9 +45,46 @@ const ReportsPanel = ({
       </Box>
 
       {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <CircularProgress />
-        </Box>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {isEditable && <TableCell><Skeleton width={100} /></TableCell>}
+                <TableCell><Skeleton width={100} /></TableCell>
+                <TableCell><Skeleton width={100} /></TableCell>
+                {onView && <TableCell><Skeleton width={100} /></TableCell>}
+                {isEditable && <TableCell><Skeleton width={100} /></TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {[...Array(skeletonRows)].map((_, index) => (
+                <TableRow key={index}>
+                  {isEditable && (
+                    <TableCell>
+                      <Skeleton variant="rectangular" height={30} />
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <Skeleton variant="rectangular" height={30} />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="rectangular" height={30} />
+                  </TableCell>
+                  {onView && (
+                    <TableCell>
+                      <Skeleton variant="rectangular" height={30} />
+                    </TableCell>
+                  )}
+                  {isEditable && (
+                    <TableCell>
+                      <Skeleton variant="rectangular" height={30} />
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : reports.length === 0 ? (

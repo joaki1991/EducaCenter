@@ -72,6 +72,7 @@ function Messages({ onLogout }) {
     }
 
     setSelectedMessage(null);
+    window.location.reload(); // Recargar la página para reflejar cambios
   };
 
   const filteredMessages = messages.filter((msg) =>
