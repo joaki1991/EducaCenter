@@ -32,39 +32,37 @@ const NewsPanel = ({ news, onAdd, onEdit, onDelete, onAttach, loading }) => {
       </Box>
 
       <TableContainer component={Paper}>    
-        {/* Si se está cargando, mostramos el Skeleton */}
+        {/* Si se está cargando, mostramos el Skeleton solo en las celdas */}
         {loading ? (
-          <Skeleton variant="rectangular" width="100%" height={400} sx={{ borderRadius: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Título</TableCell>
-                  <TableCell>Autor</TableCell>
-                  <TableCell align="center">Acciones</TableCell>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Título</TableCell>
+                <TableCell>Autor</TableCell>
+                <TableCell align="center">Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {/* Añadimos Skeleton para las filas simulando la carga */}
+              {[...Array(5)].map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton variant="text" width="80%" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="text" width="60%" />
+                  </TableCell>
+                  <TableCell align="center" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                    <Skeleton variant="rectangular" width={80} height={36} />
+                    <Skeleton variant="rectangular" width={80} height={36} />
+                    <Skeleton variant="rectangular" width={80} height={36} />
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {/* Añadimos Skeleton para las filas */}
-                {[...Array(5)].map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Skeleton variant="text" width="80%" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="60%" />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Skeleton variant="rectangular" width={80} height={40} />
-                      <Skeleton variant="rectangular" width={80} height={40} sx={{ mt: 1 }} />
-                      <Skeleton variant="rectangular" width={80} height={40} sx={{ mt: 1 }} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Skeleton>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
-          // Si no está cargando, mostramos la tabla real
+          // Si no está cargando, mostramos la tabla real con los datos
           <Table>
             <TableHead>
               <TableRow>
