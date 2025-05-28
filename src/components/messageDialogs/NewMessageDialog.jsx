@@ -10,20 +10,28 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Box,
+  Snackbar,
+  Alert,
 } from '@mui/material';
-import api from '../../api/axios'; 
+import api from '../../api/axios';
 
-// Componente NewMessageDialog: diálogo para crear y enviar un nuevo mensaje
-// Permite seleccionar destinatario, asunto y contenido, valida campos y muestra mensajes
-// Realiza la petición a la API para enviar el mensaje
+// Componente NewMessageDialog: diálogo para enviar un nuevo mensaje
+// Permite seleccionar destinatario, escribir asunto y contenido
+// Valida campos obligatorios y muestra errores si faltan
+// Envía el mensaje a la API y muestra un Snackbar con el resultado
 function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
-  // Estados para los campos del formulario y la lista de usuarios
   const [recipientId, setRecipientId] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [users, setUsers] = useState([]);
 
-  // Efecto para cargar la lista de usuarios al abrir el diálogo
+  // Estado para errores de validación
+  const [errors, setErrors] = useState({});
+  // Estado para el Snackbar de mensajes
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  // Carga la lista de usuarios cuando se abre el diálogo
   useEffect(() => {
     if (open) {
       api.get('/users.php')
@@ -32,79 +40,130 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
     }
   }, [open]);
 
-  // Maneja el envío del mensaje
+  // Valida los campos antes de enviar
+  const validate = () => {
+    const newErrors = {};
+    if (!recipientId) newErrors.recipientId = 'El destinatario es obligatorio';
+    if (!subject.trim()) newErrors.subject = 'El asunto es obligatorio';
+    if (!body.trim()) newErrors.body = 'El mensaje no puede estar vacío';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Maneja el envío del mensaje a la API
   const handleSend = async () => {
+    if (!validate()) return;
+
     try {
       const response = await api.post('/messages.php', {
         sender_id: senderId,
         receiver_id: recipientId,
-        subject,
-        body,
+        subject: subject.trim(),
+        body: body.trim(),
       });
 
-      onMessageSent(response.data); // Pasas el mensaje recién creado
-      handleClose();
+      setSnackbar({
+        open: true,
+        message: 'Mensaje enviado correctamente',
+        severity: 'success',
+      });
+
+      handleClose(); // Limpia y cierra
+      onMessageSent(response.data); // Notifica al padre
     } catch (error) {
-      // Manejo de error al enviar el mensaje
-      console.error(error);
-      alert('No se pudo enviar el mensaje.');
+      console.error('Error al enviar mensaje:', error);
+      setSnackbar({
+        open: true,
+        message: 'Error al enviar el mensaje',
+        severity: 'error',
+      });
     }
   };
 
-  // Limpia los campos y cierra el diálogo
+  // Maneja el cierre y reseteo del diálogo
   const handleClose = () => {
     setRecipientId('');
     setSubject('');
     setBody('');
-    onClose();
+    setErrors({});
+    onClose(); // Solo cierra
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Nuevo Mensaje</DialogTitle>
-      <DialogContent>
-        <FormControl fullWidth margin="dense">
-          <InputLabel id="recipient-label">Destinatario</InputLabel>
-          <Select
-            labelId="recipient-label"
-            value={recipientId}
-            label="Destinatario"
-            onChange={(e) => setRecipientId(e.target.value)}
-          >
-            {users
-              .filter((user) => user.id !== Number(senderId))
-              .map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.name} {user.surname}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
+    <>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>Nuevo Mensaje</DialogTitle>
+        <DialogContent>
+          {/* Selector del destinatario */}
+          <FormControl fullWidth margin="dense" required error={!!errors.recipientId}>
+            <InputLabel id="recipient-label">Destinatario</InputLabel>
+            <Select
+              labelId="recipient-label"
+              value={recipientId}
+              label="Destinatario"
+              onChange={(e) => setRecipientId(e.target.value)}
+            >
+              {users
+                .filter((user) => user.id !== Number(senderId))
+                .map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.name} {user.surname}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          {errors.recipientId && (
+            <Box mt={0.5} ml={1} color="error.main" fontSize="0.75rem">
+              {errors.recipientId}
+            </Box>
+          )}
 
-        <TextField
-          margin="dense"
-          label="Asunto"
-          fullWidth
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Mensaje"
-          fullWidth
-          multiline
-          rows={4}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
-        <Button onClick={handleSend} variant="contained">
-          Enviar
-        </Button>
-      </DialogActions>
-    </Dialog>
+          {/* Campo de asunto */}
+          <TextField
+            margin="dense"
+            fullWidth
+            label="Asunto"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            required
+            error={!!errors.subject}
+            helperText={errors.subject}
+          />
+
+          {/* Campo de contenido del mensaje */}
+          <TextField
+            margin="dense"
+            fullWidth
+            multiline
+            rows={4}
+            label="Mensaje"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            required
+            error={!!errors.body}
+            helperText={errors.body}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleClose}>Cancelar</Button>
+          <Button variant="contained" color="primary" onClick={handleSend}>
+            Enviar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar para mensajes de éxito o error */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+      >
+        <Alert severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
