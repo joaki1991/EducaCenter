@@ -16,7 +16,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText
+  FormHelperText,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -35,6 +36,8 @@ const EditAbsenceDialog = ({ open, onClose, absence }) => {
   const [errors, setErrors] = useState({});
   // Estado para mostrar mensajes tipo snackbar
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para controlar el estado de carga de la edición
+  const [saving, setSaving] = useState(false);
 
   // Efecto para cargar datos iniciales y estudiantes al abrir el diálogo
   useEffect(() => {
@@ -78,8 +81,9 @@ const EditAbsenceDialog = ({ open, onClose, absence }) => {
   };
 
   // Envía la edición de la falta a la API
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
+    setSaving(true); // Comienza la operación de guardado
 
     const payload = {
       id: absence.id,
@@ -88,25 +92,26 @@ const EditAbsenceDialog = ({ open, onClose, absence }) => {
       justified: parseInt(formData.justified, 10) // convertir a número
     };
 
-    api.put('/absences.php', payload)
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Falta actualizada correctamente',
-          severity: 'success'
-        });
-        onClose(true);
-        setFormData({ student_id: '', date: '', justified: '0' });
-        setErrors({});
-      })
-      .catch(err => {
-        console.error('Error al editar la falta:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al editar la falta',
-          severity: 'error'
-        });
+    try {
+      await api.put('/absences.php', payload);
+      setSnackbar({
+        open: true,
+        message: 'Falta actualizada correctamente',
+        severity: 'success'
       });
+      onClose(true);
+      setFormData({ student_id: '', date: '', justified: '0' });
+      setErrors({});
+    } catch (err) {
+      console.error('Error al editar la falta:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al editar la falta',
+        severity: 'error'
+      });
+    } finally {
+      setSaving(false); // Termina la operación de guardado
+    }
   };
 
   // Cancela la edición y limpia el formulario
@@ -183,9 +188,15 @@ const EditAbsenceDialog = ({ open, onClose, absence }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={saving}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={saving} // Deshabilita si está guardando
+            startIcon={saving ? <CircularProgress size={20} /> : null}
+          >
+            {saving ? 'Guardando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

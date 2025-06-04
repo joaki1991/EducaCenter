@@ -7,7 +7,8 @@ import {
   Button,
   Typography,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -22,28 +23,33 @@ const DeleteAbsenceDialog = ({ open, onClose, absence }) => {
     severity: 'success'
   });
 
+  // Estado para controlar si se está realizando la eliminación
+  const [deleting, setDeleting] = React.useState(false);
+
   // Maneja la eliminación de la falta llamando a la API
-  const handleDelete = () => {
-    api.delete('/absences.php', {
-      data: { id: absence.id }
-    })
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Falta eliminada correctamente',
-          severity: 'success'
-        });
-        onClose(true);
-      })
-      .catch(err => {
-        // Manejo de error al eliminar la falta
-        console.error('Error al eliminar la falta:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al eliminar la falta',
-          severity: 'error'
-        });
+  const handleDelete = async () => {
+    if (!absence) return;
+    setDeleting(true); // comienza la eliminación
+    try {
+      await api.delete('/absences.php', {
+        data: { id: absence.id }
       });
+      setSnackbar({
+        open: true,
+        message: 'Falta eliminada correctamente',
+        severity: 'success'
+      });
+      onClose(true);
+    } catch (err) {
+      console.error('Error al eliminar la falta:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al eliminar la falta',
+        severity: 'error'
+      });
+    } finally {
+      setDeleting(false); // termina la eliminación
+    }
   };
 
   // Render principal del diálogo de confirmación de eliminación
@@ -63,16 +69,17 @@ const DeleteAbsenceDialog = ({ open, onClose, absence }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => onClose(false)} color="secondary">
+          <Button onClick={() => onClose(false)} color="secondary" disabled={deleting}>
             Cancelar
           </Button>
           <Button
             onClick={handleDelete}
             color="error"
             variant="contained"
-            disabled={!absence}
+            disabled={!absence || deleting}
+            startIcon={deleting ? <CircularProgress size={20} /> : null}
           >
-            Borrar
+            {deleting ? 'Eliminando...' : 'Borrar'}
           </Button>
         </DialogActions>
       </Dialog>
