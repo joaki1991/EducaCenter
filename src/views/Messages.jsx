@@ -33,6 +33,8 @@ function Messages({ onLogout }) {
   const [newMessageOpen, setNewMessageOpen] = useState(false);
   // Mensaje seleccionado para ver detalle
   const [selectedMessage, setSelectedMessage] = useState(null);
+  // Controla el estado de carga de mensajes
+  const [loading, setLoading] = useState(true); 
 
   // Obtiene datos del usuario logueado
   const user = localStorage.getItem('EducaCenterUser');
@@ -51,12 +53,16 @@ function Messages({ onLogout }) {
 
   // Obtiene los mensajes desde la API
   const fetchMessages = async () => {
+    setLoading(true); // empieza la carga
     try {
       const response = await api.get('/messages.php');
       setMessages(response.data);
     } catch (error) {
       console.error('Error cargando mensajes:', error);
+    } finally {
+      setLoading(false); // termina la carga
     }
+    
   };
 
   // Carga los mensajes al montar el componente
@@ -117,12 +123,12 @@ function Messages({ onLogout }) {
           </Tabs>
 
           <Box sx={{ marginTop: 2 }}>
-            {filteredMessages.length > 0 ? (
-              <MessageList
-                messages={filteredMessages}
-                onMessageClick={(msg) => setSelectedMessage(msg)}
-              />
-            ) : (
+            <MessageList
+              messages={filteredMessages}
+              loading={loading}
+              onMessageClick={(msg) => setSelectedMessage(msg)}
+            />
+            {!loading && filteredMessages.length === 0 && (
               <Typography variant="body1">
                 No hay mensajes para mostrar.
               </Typography>
