@@ -8,7 +8,8 @@ import {
   TextField,
   Box,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -30,6 +31,8 @@ const AddNewDialog = ({ open, onClose }) => {
     message: '',
     severity: 'success'
   });
+  // Estado para manejar el estado de carga (loading)
+  const [sending, setSending] = useState(false);
 
   // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
@@ -47,7 +50,7 @@ const AddNewDialog = ({ open, onClose }) => {
   };
 
   // Maneja el envío del formulario para crear la noticia
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
 
     const payload = {
@@ -56,27 +59,32 @@ const AddNewDialog = ({ open, onClose }) => {
       user_id: localStorage.getItem('EducaCenterId')
     };
 
-    api.post('/announcements.php', payload)
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Anuncio añadido correctamente',
-          severity: 'success'
-        });
+    setSending(true); // Inicia el proceso de envío (loading)
 
-        setFormData({ title: '', content: '' });
-        setErrors({});
-        onClose(true); // Indica que se debe actualizar la lista
-      })
-      .catch((err) => {
-        // Manejo de error al añadir anuncio
-        console.error('Error al añadir anuncio:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al añadir anuncio',
-          severity: 'error'
-        });
+    try {
+      await api.post('/announcements.php', payload);
+
+      setSnackbar({
+        open: true,
+        message: 'Anuncio añadido correctamente',
+        severity: 'success'
       });
+
+      // Limpia el formulario y cierra el diálogo
+      setFormData({ title: '', content: '' });
+      setErrors({});
+      onClose(true); // Indica que se debe actualizar la lista
+    } catch (err) {
+      // Manejo de error al añadir anuncio
+      console.error('Error al añadir anuncio:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al añadir anuncio',
+        severity: 'error'
+      });
+    } finally {
+      setSending(false); // Finaliza el proceso de envío (loading)
+    }
   };
 
   // Maneja la cancelación y reseteo del formulario
@@ -119,18 +127,24 @@ const AddNewDialog = ({ open, onClose }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={sending}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={sending} // Deshabilita el botón mientras se está enviando
+            startIcon={sending ? <CircularProgress size={20} color="inherit" /> : null} // Muestra el spinner mientras se está enviando
+          >
+            {sending ? 'Enviando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar para mensajes de éxito o error */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-      >
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}>
         <Alert severity={snackbar.severity} variant="filled">
           {snackbar.message}
         </Alert>

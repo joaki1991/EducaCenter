@@ -8,7 +8,8 @@ import {
   Typography,
   Box,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 import API_BASE from '../../api/config';
@@ -32,6 +33,8 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
   const [preview, setPreview] = useState(currentImageUrl);
   const [error, setError] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado de carga (loading)
+  const [uploading, setUploading] = useState(false);
 
   // Efecto para resetear vista previa y errores al abrir el diálogo
   useEffect(() => {
@@ -66,6 +69,8 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
     formData.append('image', selectedFile);
     formData.append('id', announcementId);
 
+    setUploading(true); // Inicia el proceso de carga (loading)
+
     try {
       await api.post('/upload_new_photo.php', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -77,7 +82,7 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
         severity: 'success',
       });
 
-      onClose(true);
+      onClose(true); // Notifica que el archivo fue subido correctamente
     } catch (err) {
       // Manejo de error al subir la imagen
       console.error(err);
@@ -86,6 +91,8 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
         message: 'Error al subir la imagen',
         severity: 'error',
       });
+    } finally {
+      setUploading(false); // Finaliza el proceso de carga (loading)
     }
   };
 
@@ -105,6 +112,7 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
               type="file"
               accept="image/jpeg,image/jpg"
               onChange={handleFileChange}
+              disabled={uploading} // Deshabilita el input mientras se está subiendo
             />
             <Typography variant="body2" color="textSecondary">
               Solo se aceptan archivos con formato .jpg
@@ -117,13 +125,14 @@ const AttachNewDialog = ({ open, onClose, announcement }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => onClose(false)}>Cancelar</Button>
+          <Button onClick={() => onClose(false)} disabled={uploading}>Cancelar</Button>
           <Button
             variant="contained"
             onClick={handleUpload}
-            disabled={!selectedFile}
+            disabled={!selectedFile || uploading} // Deshabilita el botón si no hay archivo o está subiendo
+            startIcon={uploading ? <CircularProgress size={20} color="inherit" /> : null} // Spinner si se está subiendo
           >
-            Subir
+            {uploading ? 'Subiendo...' : 'Subir'}
           </Button>
         </DialogActions>
       </Dialog>
