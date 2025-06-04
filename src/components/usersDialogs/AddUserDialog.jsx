@@ -12,7 +12,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -33,6 +34,8 @@ const AddUserDialog = ({ open, onClose }) => {
   const [errors, setErrors] = useState({});
   // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para el spinner de carga
+  const [loading, setLoading] = useState(false);
 
   // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
@@ -53,7 +56,9 @@ const AddUserDialog = ({ open, onClose }) => {
   // Maneja el envío del formulario para crear el usuario
   const handleSubmit = () => {
     if (!validate()) return;
-  
+
+    setLoading(true); // Activa el spinner de carga
+
     const payload = {
       name: formData.name.trim(),
       surname: formData.surname.trim(),
@@ -61,15 +66,14 @@ const AddUserDialog = ({ open, onClose }) => {
       role: formData.role.trim(),
       password: formData.password || ''
     };
-  
+
     api.post('/users.php', payload)
       .then(() => {
         setSnackbar({
           open: true,
           message: 'Usuario añadido correctamente',
           severity: 'success'
-        });               
-  
+        });
         handleCancel(); // Limpia el formulario
         onClose(true); // Notifica al padre que debe recargar
       })
@@ -81,6 +85,9 @@ const AddUserDialog = ({ open, onClose }) => {
           message: 'Error al añadir usuario',
           severity: 'error'
         });
+      })
+      .finally(() => {
+        setLoading(false); // Desactiva el spinner de carga
       });
   };
 
@@ -137,6 +144,7 @@ const AddUserDialog = ({ open, onClose }) => {
                 value={formData.role}
                 onChange={handleChange}
                 label="Rol"
+                disabled={loading} // Deshabilita el select mientras se está cargando
               >
                 <MenuItem value="admin">Administrador</MenuItem>
                 <MenuItem value="teacher">Profesor</MenuItem>
@@ -162,9 +170,15 @@ const AddUserDialog = ({ open, onClose }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={loading}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={loading} // Deshabilita el botón mientras se está cargando
+            startIcon={loading ? <CircularProgress size={20} /> : null} // Spinner en el botón
+          >
+            {loading ? 'Guardando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -7,7 +7,8 @@ import {
   Button,
   Typography,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -16,37 +17,44 @@ import api from '../../api/axios';
 // Realiza la petición a la API para eliminar el usuario
 const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
   // Estado para el snackbar de mensajes
-  const [snackbar, setSnackbar] = React.useState({
+  const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
+  // Estado para el spinner de carga
+  const [loading, setLoading] = useState(false);
 
   // Maneja la eliminación del usuario llamando a la API
   const handleDelete = () => {
-      api.delete('/users.php', {
-        data: { id: user.id }
-      })
-      .then(()=> {
-        setSnackbar({
-          open: true,
-          message: 'Usuario eliminado correctamente',
-          severity: 'success'
-        });
-        if (typeof onUserDeleted === 'function') {
-          onUserDeleted();
-        }
-        onClose(true); // Notifica al padre que debe recargar
-      })
-      .catch(err => {
-        // Manejo de error al eliminar el usuario
-        console.error('Error al eliminar el usuario:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al eliminar el usuario',
-          severity: 'error'
-        });
+    setLoading(true); // Activa el spinner de carga
+
+    api.delete('/users.php', {
+      data: { id: user.id }
+    })
+    .then(() => {
+      setSnackbar({
+        open: true,
+        message: 'Usuario eliminado correctamente',
+        severity: 'success'
       });
+      if (typeof onUserDeleted === 'function') {
+        onUserDeleted();
+      }
+      onClose(true); // Notifica al padre que debe recargar
+    })
+    .catch(err => {
+      // Manejo de error al eliminar el usuario
+      console.error('Error al eliminar el usuario:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al eliminar el usuario',
+        severity: 'error'
+      });
+    })
+    .finally(() => {
+      setLoading(false); // Desactiva el spinner de carga
+    });
   };
 
   return (
@@ -65,11 +73,17 @@ const DeleteUserDialog = ({ open, onClose, user, onUserDeleted }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="secondary">
+          <Button onClick={onClose} color="secondary" disabled={loading}>
             Cancelar
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained" disabled={!user}>
-            Borrar
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            disabled={loading || !user}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+          >
+            {loading ? 'Eliminando...' : 'Borrar'}
           </Button>
         </DialogActions>
       </Dialog>
