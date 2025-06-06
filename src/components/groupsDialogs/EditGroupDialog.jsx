@@ -8,7 +8,8 @@ import {
   TextField,
   Box,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -25,13 +26,14 @@ const EditGroupDialog = ({ open, onClose, group }) => {
   const [errors, setErrors] = useState({});
   // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para manejar el proceso de actualización (loading)
+  const [updating, setUpdating] = useState(false);
 
   // Efecto para actualizar el formulario cuando cambia el grupo a editar
   useEffect(() => {
     if (group) {
-      // Si se pasa un grupo, actualizar el formulario con los datos del grupo
       setFormData({
-        name: group.name || '',        
+        name: group.name || '',
       });
     }
   }, [group]);
@@ -51,7 +53,7 @@ const EditGroupDialog = ({ open, onClose, group }) => {
   };
 
   // Maneja el envío del formulario para actualizar el grupo
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
 
     const payload = {
@@ -59,25 +61,28 @@ const EditGroupDialog = ({ open, onClose, group }) => {
       name: formData.name.trim()
     };
 
-    api.put('/groups.php', payload)
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Grupo editado correctamente',
-          severity: 'success'
-        });
-        handleCancel();
-        onClose(true); // Notifica al padre que debe recargar
-      })
-      .catch((err) => {
-        // Manejo de error al editar grupo
-        console.error('Error al editar grupo:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al editar grupo',
-          severity: 'error'
-        });
+    setUpdating(true); // Inicia el proceso de actualización (loading)
+
+    try {
+      await api.put('/groups.php', payload);
+      setSnackbar({
+        open: true,
+        message: 'Grupo editado correctamente',
+        severity: 'success'
       });
+      handleCancel();
+      onClose(true); // Notifica al padre que debe recargar
+    } catch (err) {
+      // Manejo de error al editar grupo
+      console.error('Error al editar grupo:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al editar grupo',
+        severity: 'error'
+      });
+    } finally {
+      setUpdating(false); // Finaliza el proceso de actualización (loading)
+    }
   };
 
   // Maneja la cancelación y reseteo del formulario
@@ -107,9 +112,15 @@ const EditGroupDialog = ({ open, onClose, group }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={updating}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={updating} // Deshabilita el botón si se está actualizando
+            startIcon={updating ? <CircularProgress size={20} /> : null} // Muestra el spinner mientras se actualiza
+          >
+            {updating ? 'Actualizando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

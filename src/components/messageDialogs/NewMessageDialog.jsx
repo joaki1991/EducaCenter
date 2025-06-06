@@ -4,8 +4,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
+  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -13,6 +13,7 @@ import {
   Box,
   Snackbar,
   Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -30,6 +31,8 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
   const [errors, setErrors] = useState({});
   // Estado para el Snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para manejar el estado de carga (loading)
+  const [sending, setSending] = useState(false);
 
   // Carga la lista de usuarios cuando se abre el diálogo
   useEffect(() => {
@@ -54,6 +57,8 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
   const handleSend = async () => {
     if (!validate()) return;
 
+    setSending(true); // Inicia el proceso de envío (loading)
+
     try {
       const response = await api.post('/messages.php', {
         sender_id: senderId,
@@ -77,6 +82,8 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
         message: 'Error al enviar el mensaje',
         severity: 'error',
       });
+    } finally {
+      setSending(false);  // Finaliza el proceso de envío (loading)
     }
   };
 
@@ -146,9 +153,15 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSend}>
-            Enviar
+          <Button onClick={handleClose} disabled={sending}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSend}
+            disabled={sending}  // Deshabilita el botón mientras se está enviando el mensaje
+            startIcon={sending ? <CircularProgress size={20} color="inherit" /> : null} // Muestra el spinner mientras se envía
+          >
+            {sending ? 'Enviando...' : 'Enviar'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -157,8 +170,7 @@ function NewMessageDialog({ open, onClose, onMessageSent, senderId }) {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-      >
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}>
         <Alert severity={snackbar.severity} variant="filled">
           {snackbar.message}
         </Alert>

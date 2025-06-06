@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -7,7 +7,8 @@ import {
   Button,
   Typography,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -16,14 +17,20 @@ import api from '../../api/axios';
 // Realiza la petición a la API para eliminar la noticia
 const DeleteNewDialog = ({ open, onClose, announcement }) => {
   // Estado para el snackbar de mensajes
-  const [snackbar, setSnackbar] = React.useState({
+  const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
+  // Estado de carga (loading)
+  const [deleting, setDeleting] = useState(false);
 
   // Maneja la eliminación de la noticia llamando a la API
   const handleDelete = () => {
+    if (!announcement) return;
+
+    setDeleting(true); // Inicia el proceso de eliminación
+
     api.delete('/announcements.php', {
       data: { id: announcement.id }
     })
@@ -43,6 +50,9 @@ const DeleteNewDialog = ({ open, onClose, announcement }) => {
         message: 'Error al eliminar el anuncio',
         severity: 'error'
       });
+    })
+    .finally(() => {
+      setDeleting(false); // Finaliza el proceso de eliminación
     });
   };
 
@@ -62,16 +72,17 @@ const DeleteNewDialog = ({ open, onClose, announcement }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => onClose(false)} color="secondary">
+          <Button onClick={() => onClose(false)} color="secondary" disabled={deleting}>
             Cancelar
           </Button>
           <Button
             onClick={handleDelete}
             color="error"
             variant="contained"
-            disabled={!announcement}
+            disabled={!announcement || deleting} // Deshabilita el botón mientras se está eliminando
+            startIcon={deleting ? <CircularProgress size={20} color="inherit" /> : null} // Spinner mientras se elimina
           >
-            Borrar
+            {deleting ? 'Eliminando...' : 'Borrar'}
           </Button>
         </DialogActions>
       </Dialog>

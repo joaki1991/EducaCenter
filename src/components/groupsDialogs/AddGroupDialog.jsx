@@ -8,7 +8,8 @@ import {
   TextField,
   Box,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -25,6 +26,8 @@ const AddGroupDialog = ({ open, onClose }) => {
   const [errors, setErrors] = useState({});
   // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para controlar el estado de carga de la creación
+  const [saving, setSaving] = useState(false);
 
   // Maneja el cambio de los campos del formulario
   const handleChange = (e) => {
@@ -41,32 +44,33 @@ const AddGroupDialog = ({ open, onClose }) => {
   };
 
   // Maneja el envío del formulario para crear el grupo
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
+    setSaving(true); // Comienza la operación de guardado
 
     const payload = {
       name: formData.name.trim(),
     };
 
-    api.post('/groups.php', payload)
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Grupo añadido correctamente',
-          severity: 'success'
-        });
-        handleCancel();
-        onClose(true); // Notifica al padre que debe recargar
-      })
-      .catch((err) => {
-        // Manejo de error al añadir grupo
-        console.error('Error al añadir grupo:', err);
-        setSnackbar({
-          open: true,
-          message: 'Error al añadir grupo',
-          severity: 'error'
-        });
+    try {
+      await api.post('/groups.php', payload);
+      setSnackbar({
+        open: true,
+        message: 'Grupo añadido correctamente',
+        severity: 'success'
       });
+      handleCancel();
+      onClose(true); // Notifica al padre que debe recargar
+    } catch (err) {
+      console.error('Error al añadir grupo:', err);
+      setSnackbar({
+        open: true,
+        message: 'Error al añadir grupo',
+        severity: 'error'
+      });
+    } finally {
+      setSaving(false); // Termina la operación de guardado
+    }
   };
 
   // Maneja la cancelación y reseteo del formulario
@@ -96,13 +100,20 @@ const AddGroupDialog = ({ open, onClose }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={saving}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={saving} // Deshabilita si está guardando
+            startIcon={saving ? <CircularProgress size={20} /> : null}
+          >
+            {saving ? 'Guardando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar para mostrar mensajes de éxito o error */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

@@ -8,7 +8,8 @@ import {
   TextField,
   Box,
   Snackbar,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -26,6 +27,8 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
   const [errors, setErrors] = useState({});
   // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para manejar el proceso de actualización (loading)
+  const [updating, setUpdating] = useState(false);
 
   // Efecto para actualizar el formulario cuando cambia el anuncio a editar
   useEffect(() => {
@@ -65,6 +68,8 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
       content: formData.content.trim()
     };
 
+    setUpdating(true); // Inicia el proceso de actualización (loading)
+
     api.put('/announcements.php', payload)
       .then(() => {
         setSnackbar({
@@ -85,6 +90,9 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
           message: 'Error al editar el anuncio',
           severity: 'error'
         });
+      })
+      .finally(() => {
+        setUpdating(false); // Finaliza el proceso de actualización (loading)
       });
   };
 
@@ -128,9 +136,17 @@ const EditNewDialog = ({ open, onClose, announcement }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={updating}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={updating} // Deshabilita el botón mientras se está actualizando
+            startIcon={updating ? <CircularProgress size={20} /> : null} // Muestra el spinner mientras se actualiza
+          >
+            {updating ? 'Actualizando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

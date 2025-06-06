@@ -17,7 +17,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText
+  FormHelperText,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -45,6 +46,9 @@ const AddAbsenceDialog = ({ open, onClose }) => {
 
   // Estado para el id del profesor
   const [teacherId, setTeacherId] = useState(null);
+
+  // Estado para controlar si se está enviando el formulario
+  const [submitting, setSubmitting] = useState(false);
 
   // Efecto para cargar estudiantes y obtener el id del profesor al abrir el diálogo
   useEffect(() => {
@@ -99,7 +103,7 @@ const AddAbsenceDialog = ({ open, onClose }) => {
   };
 
   // Maneja el envío del formulario para crear la falta
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     if (!teacherId) {
       setSnackbar({
@@ -110,6 +114,8 @@ const AddAbsenceDialog = ({ open, onClose }) => {
       return;
     }
 
+    setSubmitting(true); // comienza el envío
+
     const payload = {
       student_id: formData.student_id,
       date: formData.date,
@@ -117,24 +123,25 @@ const AddAbsenceDialog = ({ open, onClose }) => {
       teacher_id: teacherId
     };
 
-    api.post('/absences.php', payload)
-      .then(() => {
-        setSnackbar({
-          open: true,
-          message: 'Falta añadida correctamente',
-          severity: 'success'
-        });
-        setFormData({ student_id: '', date: '', justified: '' });
-        setErrors({});
-        onClose(true);
-      })
-      .catch(() => {
-        setSnackbar({
-          open: true,
-          message: 'Error al añadir falta',
-          severity: 'error'
-        });
+    try {
+      await api.post('/absences.php', payload);
+      setSnackbar({
+        open: true,
+        message: 'Falta añadida correctamente',
+        severity: 'success'
       });
+      setFormData({ student_id: '', date: '', justified: '' });
+      setErrors({});
+      onClose(true);
+    } catch {
+      setSnackbar({
+        open: true,
+        message: 'Error al añadir falta',
+        severity: 'error'
+      });
+    } finally {
+      setSubmitting(false); // termina el envío
+    }
   };
 
   // Maneja la cancelación y reseteo del formulario
@@ -197,9 +204,15 @@ const AddAbsenceDialog = ({ open, onClose }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={submitting}>Cancelar</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={submitting} // Botón deshabilitado mientras se envía
+            startIcon={submitting ? <CircularProgress size={20} /> : null} // Spinner en botón
+          >
+            {submitting ? 'Enviando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

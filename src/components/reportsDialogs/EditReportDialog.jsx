@@ -16,7 +16,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText
+  FormHelperText,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -33,6 +34,8 @@ const EditReportDialog = ({ open, onClose, report }) => {
   const [errors, setErrors] = useState({});
   // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para el proceso de carga (loading)
+  const [loading, setLoading] = useState(false);
 
   // Efecto para actualizar el formulario y cargar estudiantes cuando cambia el informe a editar
   useEffect(() => {
@@ -80,6 +83,8 @@ const EditReportDialog = ({ open, onClose, report }) => {
   const handleSubmit = () => {
     if (!validate()) return;
 
+    setLoading(true); // Inicia el proceso de carga
+
     const payload = {
       id: report.id,
       student_id: formData.student_id,
@@ -105,6 +110,9 @@ const EditReportDialog = ({ open, onClose, report }) => {
           message: 'Error al editar el informe',
           severity: 'error'
         });
+      })
+      .finally(() => {
+        setLoading(false); // Finaliza el proceso de carga
       });
   };
 
@@ -133,6 +141,7 @@ const EditReportDialog = ({ open, onClose, report }) => {
                 value={formData.student_id}
                 onChange={handleChange}
                 label="Estudiante"
+                disabled={loading} // Deshabilita la selección de estudiante si está cargando
               >
                 {students.map((student) => (
                   <MenuItem key={student.id} value={student.id}>
@@ -157,13 +166,22 @@ const EditReportDialog = ({ open, onClose, report }) => {
               required
               error={!!errors.content}
               helperText={errors.content}
+              disabled={loading} // Deshabilita el campo de contenido si está cargando
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={loading} // Deshabilita el botón mientras se está procesando
+            startIcon={loading ? <CircularProgress size={20} /> : null} // Muestra el spinner de carga
+          >
+            {loading ? 'Actualizando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

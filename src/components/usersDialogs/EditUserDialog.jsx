@@ -15,7 +15,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  CircularProgress
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -33,6 +34,8 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
   const [errors, setErrors] = useState({});
   // Estado para el snackbar de mensajes
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  // Estado para el spinner de carga
+  const [loading, setLoading] = useState(false);
 
   // Efecto para actualizar el formulario cuando cambia el usuario a editar
   useEffect(() => {
@@ -67,20 +70,22 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
   // Maneja el envío del formulario para actualizar el usuario
   const handleSubmit = () => {
     if (!validate()) return;
+    setLoading(true); // Inicia la carga
 
     const payload = {
       id: user.id,  // Usamos el id del usuario pasado como prop
       name: formData.name.trim(),
       surname: formData.surname.trim(),
       email: formData.email?.trim() || '',
-      role: formData.role.trim(),      
+      role: formData.role.trim(),
     };
+
     // Solo agrega la contraseña si el campo no está vacío
     if (formData.password.trim()) {
       payload.password = formData.password;
     }
 
-    api.put('/users.php', payload) 
+    api.put('/users.php', payload)
       .then(() => {
         setSnackbar({
           open: true,
@@ -102,6 +107,9 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
           message: 'Error al editar el usuario',
           severity: 'error'
         });
+      })
+      .finally(() => {
+        setLoading(false); // Finaliza la carga
       });
   };
 
@@ -193,9 +201,17 @@ const EditUserDialog = ({ open, onClose, user, onUserUpdated }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>Cancelar</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Guardar
+          <Button onClick={handleCancel} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+          >
+            {loading ? 'Guardando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

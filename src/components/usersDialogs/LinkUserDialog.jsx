@@ -25,7 +25,7 @@ const LinkUserDialog = ({ open, onClose, user }) => {
   const [parents, setParents] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState('');
   const [selectedParent, setSelectedParent] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Estado para controlar la carga
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -34,8 +34,9 @@ const LinkUserDialog = ({ open, onClose, user }) => {
 
   // Efecto para cargar grupos y padres al abrir el diálogo
   useEffect(() => {
-    if (open) {
+    if (open && user) {
       setLoading(true);
+
       // Cargar los grupos
       api.get('/groups.php')
         .then(res => {
@@ -74,6 +75,10 @@ const LinkUserDialog = ({ open, onClose, user }) => {
 
   // Maneja el guardado de la vinculación según el rol
   const handleSave = () => {
+    if (loading || !user) return; // Si ya estamos cargando o no hay usuario, no ejecutar
+
+    setLoading(true); // Activa el loading mientras procesamos
+
     if (user.role === 'teacher' && selectedGroup) {
       // Crear o actualizar en tabla `teachers`
       api.put('/teachers.php', {
@@ -85,7 +90,7 @@ const LinkUserDialog = ({ open, onClose, user }) => {
             open: true,
             message: 'Profesor vinculado al grupo correctamente',
             severity: 'success'
-          });        
+          });
           onClose(true); // Notifica al padre que debe recargar
         })
         .catch(err => {
@@ -96,6 +101,9 @@ const LinkUserDialog = ({ open, onClose, user }) => {
             message: 'Error al vincular al grupo',
             severity: 'error'
           });
+        })
+        .finally(() => {
+          setLoading(false); // Finaliza la carga
         });
 
     } else if (user.role === 'student' && (selectedGroup || selectedParent)) {
@@ -110,7 +118,7 @@ const LinkUserDialog = ({ open, onClose, user }) => {
             open: true,
             message: 'Estudiante vinculado correctamente',
             severity: 'success'
-          });        
+          });
           onClose(true); // Notifica al padre que debe recargar
         })
         .catch(err => {
@@ -121,6 +129,9 @@ const LinkUserDialog = ({ open, onClose, user }) => {
             message: 'Error al vincular al grupo y al padre',
             severity: 'error'
           });
+        })
+        .finally(() => {
+          setLoading(false); // Finaliza la carga
         });
 
     } else {
@@ -130,14 +141,18 @@ const LinkUserDialog = ({ open, onClose, user }) => {
         message: 'Debe seleccionar un grupo o un padre (si es estudiante)',
         severity: 'warning'
       });
+      setLoading(false); // Finaliza la carga
     }
   };
+
   return (
     <>
       <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Vincular Usuario</DialogTitle>
         <DialogContent>
-          {loading ? (
+          {!user ? (
+            <Typography>Cargando usuario...</Typography>
+          ) : loading ? (
             <CircularProgress />
           ) : (
             <>
@@ -201,11 +216,17 @@ const LinkUserDialog = ({ open, onClose, user }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="secondary">
+          <Button onClick={onClose} color="secondary" disabled={loading}>
             Cancelar
           </Button>
-          <Button onClick={handleSave} color="primary" variant="contained">
-            Guardar
+          <Button
+            onClick={handleSave}
+            color="primary"
+            variant="contained"
+            disabled={loading || !user}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+          >
+            {loading ? 'Guardando...' : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>
