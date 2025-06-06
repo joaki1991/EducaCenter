@@ -34,8 +34,9 @@ const LinkUserDialog = ({ open, onClose, user }) => {
 
   // Efecto para cargar grupos y padres al abrir el diálogo
   useEffect(() => {
-    if (open) {
+    if (open && user) {
       setLoading(true);
+
       // Cargar los grupos
       api.get('/groups.php')
         .then(res => {
@@ -74,7 +75,7 @@ const LinkUserDialog = ({ open, onClose, user }) => {
 
   // Maneja el guardado de la vinculación según el rol
   const handleSave = () => {
-    if (loading) return; // Si ya estamos cargando, no ejecutar otra acción
+    if (loading || !user) return; // Si ya estamos cargando o no hay usuario, no ejecutar
 
     setLoading(true); // Activa el loading mientras procesamos
 
@@ -149,7 +150,9 @@ const LinkUserDialog = ({ open, onClose, user }) => {
       <Dialog open={open} onClose={() => onClose(false)}>
         <DialogTitle>Vincular Usuario</DialogTitle>
         <DialogContent>
-          {loading ? (
+          {!user ? (
+            <Typography>Cargando usuario...</Typography>
+          ) : loading ? (
             <CircularProgress />
           ) : (
             <>
@@ -220,7 +223,7 @@ const LinkUserDialog = ({ open, onClose, user }) => {
             onClick={handleSave}
             color="primary"
             variant="contained"
-            disabled={loading}
+            disabled={loading || !user}
             startIcon={loading ? <CircularProgress size={20} /> : null}
           >
             {loading ? 'Guardando...' : 'Guardar'}

@@ -17,7 +17,7 @@ import MailIcon from '@mui/icons-material/MailOutline';
 
 // Componente MessageList: muestra la lista de mensajes y permite seleccionar uno para ver su detalle
 // Resalta los mensajes no leídos y muestra asunto, remitente y fecha
-// Ahora incluye un skeleton mientras se cargan los mensajes
+// Incluye un skeleton mientras se cargan los mensajes
 function MessageList({ messages, onMessageClick, loading = false }) {
   // Crea un arreglo de placeholders para mostrar skeletons
   const skeletonArray = Array.from({ length: 5 });
@@ -35,6 +35,7 @@ function MessageList({ messages, onMessageClick, loading = false }) {
               </ListItemAvatar>
               {/* Skeletons para el texto del mensaje */}
               <ListItemText
+                disableTypography // Previene el envoltorio automático en <p>
                 primary={<Skeleton variant="text" width="80%" />}
                 secondary={
                   <Box>
@@ -73,24 +74,25 @@ function MessageList({ messages, onMessageClick, loading = false }) {
                 </ListItemAvatar>
                 {/* Asunto y resumen del mensaje */}
                 <ListItemText
+                  disableTypography // Control total sobre la semántica para evitar errores HTML
                   primary={
                     <Typography
                       variant="subtitle1"
                       fontWeight={isRead ? 'normal' : 'bold'}
-                      component="span"
+                      component="div"
                     >
                       {msg.subject || 'Sin asunto'}
                     </Typography>
                   }
                   secondary={
-                    <>
+                    <Box>
                       {/* Cuerpo del mensaje (resumido) */}
                       <Typography
                         variant="body2"
                         color="textSecondary"
                         fontWeight={isRead ? 'normal' : 'bold'}
-                        component="span"
-                        sx={{ display: 'block', marginBottom: 0.5 }}
+                        component="div"
+                        sx={{ marginBottom: 0.5 }}
                       >
                         {msg.body?.slice(0, 100) || 'Sin contenido'}...
                       </Typography>
@@ -98,12 +100,11 @@ function MessageList({ messages, onMessageClick, loading = false }) {
                       <Typography
                         variant="caption"
                         color="textSecondary"
-                        component="span"
-                        sx={{ display: 'block' }}
+                        component="div"
                       >
                         Enviado por: {msg.sender_name || msg.sender_id} | Fecha: {msg.created_at || '---'}
                       </Typography>
-                    </>
+                    </Box>
                   }
                 />
               </ListItem>
