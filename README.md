@@ -1,2 +1,2 @@
 Para poder iniciar la aplicación como administrador debes introducir en correo admin@admin.com y en contraseña EducaCenter2025.
-Despues de esto es recomendable cambiar el correo y contraseña del administrador y comenzar a agregar nuevos usuarios o explorar las funcionalidades de la aplicación.
+Despues de esto es recomendable cambiar el correo y contraseña del administrador y comenzar a agregar nuevos usuarios o explorar las funcionalidades de la aplicación. Si quieres saber más de la aplicación o de como funciona la parte backend no dudes en contactarme
