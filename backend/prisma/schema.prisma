@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  COMPANY_ADMIN
+  EMPLOYEE
+  MANAGER
+}
+
+enum TimeEntryType {
+  IN
+  OUT
+}
+
+enum VacationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PlanType {
+  FREE
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  cif       String   @unique
+  plan      PlanType @default(BASIC)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  employees        Employee[]
+  timeEntries      TimeEntry[]
+  vacationRequests VacationRequest[]
+  auditLogs        AuditLog[]
+  userCompanies    UserCompany[]
+
+  @@index([cif])
+  @@map("companies")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(EMPLOYEE)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  employee      Employee?
+  auditLogs     AuditLog[]
+  userCompanies UserCompany[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// For multi-company access (gestorías)
+model UserCompany {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@index([userId])
+  @@index([companyId])
+  @@map("user_companies")
+}
+
+model Employee {
+  id         String    @id @default(cuid())
+  userId     String    @unique
+  companyId  String
+  startDate  DateTime
+  endDate    DateTime?
+  workCenter String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Relations
+  timeEntries      TimeEntry[]
+  vacationRequests VacationRequest[]
+
+  @@index([userId])
+  @@index([companyId])
+  @@map("employees")
+}
+
+model TimeEntry {
+  id         String        @id @default(cuid())
+  employeeId String
+  companyId  String
+  type       TimeEntryType
+  timestamp  DateTime      @default(now())
+  latitude   Float?
+  longitude  Float?
+  comment    String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([companyId])
+  @@index([timestamp])
+  @@map("time_entries")
+}
+
+model VacationRequest {
+  id            String         @id @default(cuid())
+  employeeId    String
+  companyId     String
+  startDate     DateTime
+  endDate       DateTime
+  daysRequested Int
+  status        VacationStatus @default(PENDING)
+  rejectionNote String?
+  approvedBy    String?
+  approvedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([companyId])
+  @@index([status])
+  @@map("vacation_requests")
+}
+
+model Holiday {
+  id     String   @id @default(cuid())
+  date   DateTime
+  name   String
+  region String   @default("ES") // ES for Spain, or specific regions like "MD" for Madrid
+
+  @@unique([date, region])
+  @@index([date])
+  @@map("holidays")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String?
+  action    String // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity    String // TimeEntry, VacationRequest, Employee, etc.
+  entityId  String?
+  timestamp DateTime @default(now())
+  metadata  Json? // Additional context data
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([timestamp])
+  @@index([entity])
+  @@map("audit_logs")
+}
