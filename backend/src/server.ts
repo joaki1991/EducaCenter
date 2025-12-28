@@ -9,6 +9,7 @@ import companyRoutes from './routes/company.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 import timeEntryRoutes from './routes/timeEntry.routes.js';
 import vacationRoutes from './routes/vacation.routes.js';
+import reportRoutes from './routes/report.routes.js';
 
 const fastify = Fastify({
   logger: {
@@ -46,6 +47,7 @@ fastify.register(companyRoutes, { prefix: '/api/companies' });
 fastify.register(employeeRoutes, { prefix: '/api/employees' });
 fastify.register(timeEntryRoutes, { prefix: '/api/time-entries' });
 fastify.register(vacationRoutes, { prefix: '/api/vacations' });
+fastify.register(reportRoutes, { prefix: '/api/reports' });
 
 // Error handler
 fastify.setErrorHandler((error, request, reply) => {
